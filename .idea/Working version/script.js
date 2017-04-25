@@ -157,7 +157,7 @@ function appendGroups(){
         .attr('id', 'complexPoints');
     complexCanvas.append('g')
         .attr('class', 'circle')
-        .attr('id', 'complexDataCircle');
+        .attr('id', 'complexDataCircles');
 }
 
 function updateGridLines() {
@@ -780,17 +780,9 @@ function importData() {
             }));
             yRange = yMax - yMin;
 
-            dataRange = d3.max([xRange, yRange]);
-            dataPadding = 0.1 * dataRange;
-            // dataMin = d3.min([xMin, yMin]);
-            xScale.domain([xMin - dataPadding, xMin + dataRange + dataPadding]);
-            yScale.domain([yMin - dataPadding, yMin + dataRange + dataPadding]);
-
-            d3.select('#complexInput')
-                .attr('min', 0.05 * dataRange)
-                .attr('max', 0.5 * dataRange)
-                .attr('value', 0.2 * dataRange);
-
+            dataVals = setDataRange(xRange, yRange);
+            xScale.domain([xMin - dataVals[1], xMin + dataVals[0] + dataVals[1]]);
+            yScale.domain([yMin - dataVals[1], yMin + dataVals[0] + dataVals[1]]);
 
             complexCanvas.attr("transform", d3.zoomIdentity)
             newxScale = false;
@@ -801,19 +793,31 @@ function importData() {
             gY.call(yAxis.scale(yScale));
             updateGridLines()
 
-            //reset to default view and calculate complexes
-            c = document.getElementById('coverCheckbox');
-            c.disabled = false;
-            c.checked = true;
-            n = document.getElementById('nodeCheckbox');
-            n.disabled = false;
-            n.checked = true;
-            document.getElementById('edgeCheckbox').disabled = 0;
-            document.getElementById('faceCheckbox').disabled = 0;
-            renderPoints();
-            updateComplex(document.getElementById('complexInput').value);
+            resetToDefaultView();
         });
     }
+}
+
+function resetToDefaultView(){
+    c = document.getElementById('coverCheckbox');
+    c.checked = coverageState;
+    n = document.getElementById('nodeCheckbox');
+    n.checked = nodeState;
+    document.getElementById('edgeCheckbox').disabled = edgeState;
+    document.getElementById('faceCheckbox').disabled = faceState;
+    renderPoints();
+    updateComplex(document.getElementById('complexInput').value);
+}
+
+function setDataRange(xRange, yRange){
+    dataRange = d3.max([xRange, yRange]);
+    dataPadding = 0.1 * dataRange;
+
+    d3.select('#complexInput')
+        .attr('min', 0.05 * dataRange)
+        .attr('max', 0.5 * dataRange)
+        .attr('value', 0.2 * dataRange);
+    return [dataRange, dataPadding];
 }
 
 function randomData() {
@@ -841,25 +845,9 @@ function randomData() {
 
     perturbData();
 
-    dataRange = d3.max([xd[1] - xd[0], yd[1] - yd[0]]);
-    dataPadding = 0.1 * dataRange;
+    setDataRange(xd[1] - xd[0], yd[1] - yd[0]);
 
-    d3.select('#complexInput')
-        .attr('min', 0.05 * dataRange)
-        .attr('max', 0.5 * dataRange)
-        .attr('value', 0.2 * dataRange);
-
-    c = document.getElementById('coverCheckbox');
-    c.disabled = false;
-    c.checked = true;
-    n = document.getElementById('nodeCheckbox');
-    n.disabled = false;
-    n.checked = true;
-    document.getElementById('edgeCheckbox').disabled = 0;
-    document.getElementById('faceCheckbox').disabled = 0;
-
-    renderPoints();
-    updateComplex(document.getElementById('complexInput').value);
+    resetToDefaultView();
 }
 
 function saveData() {
