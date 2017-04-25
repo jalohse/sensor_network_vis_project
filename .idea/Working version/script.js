@@ -73,17 +73,6 @@ var edgeOpacityScale = d3.scaleLinear().range([0.2, 1]).domain([0.01, 1]);
 var edgeWidthScale = d3.scaleLinear().range([2, 6]).domain([0.01, 1]);
 
 
-
-//
-// complexSVG.append("path")
-//     .attr("class", "grid")
-//     .attr("d", d3.range(cellSize, width+padding*2, cellSize)
-//             .map(function(x) { return "M" + Math.round(x) + ",0V" + height+padding; })
-//             .join("")
-//         + d3.range(cellSize, height+padding*2, cellSize)
-//             .map(function(y) { return "M0," + Math.round(y) + "H" + width+padding; })
-//             .join(""));
-
 var complexCanvas = complexSVG.append('g')
     .attr('class','cech')
     .attr('id','complexCanvas');
@@ -96,12 +85,6 @@ complexSVG.append('rect')
     .style('fill','none')
     .style('stroke','#000')
     .style('stroke-opacity',1);
-
-// complexSVG.attr('cursor','crosshair')
-//     .on('click',function () {
-//         coords = d3.mouse(this);
-//         console.log(coords)
-//     });
 
 var zoom = d3.zoom()
     .scaleExtent([0.1, 10])
@@ -135,15 +118,24 @@ window.addEventListener('keydown', function (event) {
     }
 });
 
-renderGrid();
-
 dataLoader('data/data.off')
 
 function renderGrid() {
 
-    d3.select('#xlines').remove();
-    d3.select('#ylines').remove();
+    var xlines = complexSVG.append('g')
+        .attr('class','grid')
+        .attr('id','xlines');
 
+
+    var ylines = complexSVG.append('g')
+        .attr('class','grid')
+        .attr('id','ylines');
+
+    updateLines();
+
+}
+
+function updateLines(){
     var xt = xAxis.scale().ticks();
 
     var xticks = (newxScale) ?
@@ -154,19 +146,16 @@ function renderGrid() {
             return xScale(d) + padding;
         });
 
-    var xlines = complexSVG.append('g')
-        .attr('class','grid')
-        .attr('id','xlines');
-
-
-    xlines.selectAll('line').data(xticks)
-        .enter().append('line')
+    var xLines = d3.select('#xlines').selectAll('line').data(xticks);
+    xLines.enter().append('line')
         .attr('id','xline')
         .attr('class','grid')
+        .merge(xLines)
         .attr('x1', function (d) { return d })
         .attr('y1', padding)
         .attr('x2', function (d) { return d })
         .attr('y2', height+padding);
+    xLines.exit().remove();
 
     var yt = yAxis.scale().ticks();
 
@@ -178,19 +167,16 @@ function renderGrid() {
             return yScale(d) + padding;
         });
 
-    var ylines = complexSVG.append('g')
-        .attr('class','grid')
-        .attr('id','ylines');
-
-
-    ylines.selectAll('line').data(yticks)
-        .enter().append('line')
+    var yLines = d3.select('#ylines').selectAll('line').data(yticks);
+    yLines.enter().append('line')
         .attr('id','yline')
         .attr('class','grid')
+        .merge(yLines)
         .attr('y1', function (d) { return d })
         .attr('x1', padding)
         .attr('y2', function (d) { return d })
         .attr('x2', height+padding);
+    yLines.exit().remove();
 }
 
 function zoomed() {
@@ -216,7 +202,7 @@ function zoomed() {
             changeComplex();
         }
     }
-    renderGrid();
+    updateLines();
 }
 
 //this function is called whenever the data are changed.
@@ -804,7 +790,7 @@ function importData() {
 
             gX.call(xAxis.scale(xScale));
             gY.call(yAxis.scale(yScale));
-            renderGrid()
+            updateLines()
 
             //reset to default view and calculate complexes
             c = document.getElementById('coverCheckbox');
@@ -1021,7 +1007,7 @@ function dataLoader(file) {
 
         gX.call(xAxis.scale(xScale));
         gY.call(yAxis.scale(yScale));
-        renderGrid()
+        renderGrid();
 
         //adjust radius slider
         d3.select('#complexInput')
@@ -1276,7 +1262,7 @@ function clearScreen() {
     gY.call(yAxis.scale(yScale));
     newxScale = false;
     newyScale = false;
-    renderGrid();
+    updateLines();
 
     complexRadius = 10;
     numSamples = 0;
