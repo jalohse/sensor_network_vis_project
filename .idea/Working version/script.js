@@ -134,6 +134,15 @@ function appendGroups(){
         .attr('class', 'grid')
         .attr('id', 'xlines');
 
+    complexCanvas.append('g')
+        .attr('class', 'circle')
+        .attr('id', 'complexCircles')
+    complexCanvas.append('g')
+        .attr('class', 'point')
+        .attr('id', 'complexPoints');
+    complexCanvas.append('g')
+        .attr('class', 'circle')
+        .attr('id', 'complexDataCircles');
 
     complexSVG.append('g')
         .attr('class', 'grid')
@@ -149,15 +158,6 @@ function appendGroups(){
         .attr('class', 'edge')
         .style('visibility', 'hidden');
 
-    complexCanvas.append('g')
-        .attr('class', 'circle')
-        .attr('id', 'complexCircles')
-    complexCanvas.append('g')
-        .attr('class', 'point')
-        .attr('id', 'complexPoints');
-    complexCanvas.append('g')
-        .attr('class', 'circle')
-        .attr('id', 'complexDataCircles');
 }
 
 function updateGridLines() {
