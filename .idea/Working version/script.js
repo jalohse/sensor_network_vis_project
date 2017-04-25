@@ -764,25 +764,7 @@ function importData() {
             numSamples = locationData.length;
             perturbData();
 
-            //set data scale
-            xMin = d3.min(locationData.map(function (d) {
-                return d.anchor.x;
-            }));
-            xMax = d3.max(locationData.map(function (d) {
-                return d.anchor.x;
-            }));
-            xRange = xMax - xMin;
-            yMin = d3.min(locationData.map(function (d) {
-                return d.anchor.y;
-            }));
-            yMax = d3.max(locationData.map(function (d) {
-                return d.anchor.y;
-            }));
-            yRange = yMax - yMin;
-
-            dataVals = setDataRange(xRange, yRange);
-            xScale.domain([xMin - dataVals[1], xMin + dataVals[0] + dataVals[1]]);
-            yScale.domain([yMin - dataVals[1], yMin + dataVals[0] + dataVals[1]]);
+           calculateRange();
 
             complexCanvas.attr("transform", d3.zoomIdentity)
             newxScale = false;
@@ -800,13 +782,35 @@ function importData() {
 
 function resetToDefaultView(){
     c = document.getElementById('coverCheckbox');
+    c.disabled = false;
     c.checked = coverageState;
     n = document.getElementById('nodeCheckbox');
+    n.disabled = false;
     n.checked = nodeState;
     document.getElementById('edgeCheckbox').disabled = edgeState;
     document.getElementById('faceCheckbox').disabled = faceState;
     renderPoints();
     updateComplex(document.getElementById('complexInput').value);
+}
+
+function calculateRange(){
+    xMin = d3.min(locationData.map(function (d) {
+        return d.anchor.x;
+    }));
+    xMax = d3.max(locationData.map(function (d) {
+        return d.anchor.x;
+    }));
+    xRange = xMax - xMin;
+    yMin = d3.min(locationData.map(function (d) {
+        return d.anchor.y;
+    }));
+    yMax = d3.max(locationData.map(function (d) {
+        return d.anchor.y;
+    }));
+    yRange = yMax - yMin;
+    dataVals = setDataRange(xRange, yRange);
+    xScale.domain([xMin - dataVals[1], xMin + dataVals[0] + dataVals[1]]);
+    yScale.domain([yMin - dataVals[1], yMin + dataVals[0] + dataVals[1]]);
 }
 
 function setDataRange(xRange, yRange){
@@ -975,58 +979,29 @@ function dataLoader(file) {
         }
 
 
-        //set data scale
-        var xMin = d3.min(locationData.map(function (d) {
-            return d.anchor.x;
-        }));
-        var xMax = d3.max(locationData.map(function (d) {
-            return d.anchor.x;
-        }));
-        var xRange = xMax - xMin;
-        var yMin = d3.min(locationData.map(function (d) {
-            return d.anchor.y;
-        }));
-        var yMax = d3.max(locationData.map(function (d) {
-            return d.anchor.y;
-        }));
-        var yRange = yMax - yMin;
-
-        var dataRange = d3.max([xRange, yRange]);
-        var dataPadding = 0.1 * dataRange;
-        var rmax = d3.max([complexRadius, Math.ceil(0.5 * dataRange)]);
-
-        xScale.domain([xMin - dataPadding, xMin + dataRange + dataPadding]);
-        yScale.domain([yMin - dataPadding, yMin + dataRange + dataPadding]);
+        calculateRange();
 
         complexCanvas.attr("transform", d3.zoomIdentity)
         newxScale = false;
         newyScale = false;
         newZscale = 1;
+        var rmax = d3.max([complexRadius, Math.ceil(0.5 * dataRange)]);
+
 
         gX.call(xAxis.scale(xScale));
         gY.call(yAxis.scale(yScale));
         updateGridLines();
 
         //adjust radius slider
-        d3.select('#complexInput')
-            .attr('min', 1)
-            .attr('max', rmax);
         d3.select('#complexInput').node().value = complexRadius;
         d3.select('#complexRadius')
             .attr('min', 1)
             .attr('max', rmax);
         d3.select('#complexRadius').attr('value', complexRadius)
 
-        c = document.getElementById('coverCheckbox');
-        c.disabled = false;
-        c.checked = true;
-        n = document.getElementById('nodeCheckbox');
-        n.disabled = false;
-        n.checked = true;
-        document.getElementById('edgeCheckbox').disabled = 0;
-        document.getElementById('faceCheckbox').disabled = 0;
-
         perturbData();
+
+       resetToDefaultView();
 
         renderPoints();
         changeComplex();
