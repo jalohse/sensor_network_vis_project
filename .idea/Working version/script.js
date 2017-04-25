@@ -1059,14 +1059,7 @@ function updateNode(coords) {
     console.log("update radius:" + complexRadius)
 
     if (locationData.length == 0) {
-        c = document.getElementById('coverCheckbox');
-        c.disabled = false;
-        c.checked = true;
-        n = document.getElementById('nodeCheckbox');
-        n.disabled = false;
-        n.checked = true;
-        document.getElementById('edgeCheckbox').disabled = 0;
-        document.getElementById('faceCheckbox').disabled = 0;
+        resetToDefaultView();
     }
     ;
 
@@ -1088,44 +1081,23 @@ function updateNode(coords) {
     updateComplex(document.getElementById('complexInput').value);
 }
 
-// function updateLocation(coords) {
-//     locationData[selectedNode].anchor.x = coords[0];
-//     locationData[selectedNode].anchor.y = coords[1];
-//     updateCech(document.getElementById('complexInput').value);
-//     window.addEventListener('keypress', function (evt) {
-//         complexCanvas.attr('cursor',null)
-//             .on('click',null);
-//     });
-// }
-
-function myMap() {
-    var mapCanvas = document.getElementById('map');
-    var mapOptions = {
-        center: new google.maps.LatLng(40.762, -111.839),
-        zoom: 16
-    };
-    var map = new google.maps.Map(mapCanvas, mapOptions);
-}
-
 function showCoverage(d) {
     if (d) {
-        fillColor = 'mediumpurple';
-        fillOpacity = '0.1';
         d3.select('#complexCircles').selectAll('circle')
             .transition()
             .style('visibility', 'visible')
-            .style('fill', fillColor)
-            .style('fill-opacity', 0.2);
-        d3.select('#complexDataCircle').selectAll('circle')
+            .style('fill', purpleColor)
+            .style('fill-opacity',anchorOpacity);
+        d3.select('#complexDataCircles').selectAll('circle')
             .transition()
             .style('visibility', 'visible')
-            .style('fill', fillColor)
-            .style('fill-opacity', 0.1);
+            .style('fill', purpleColor)
+            .style('fill-opacity', extraDataOpacity);
     } else {
         d3.select('#complexCircles').selectAll('circle')
             .transition()
             .style('fill', 'none');
-        d3.select('#complexDataCircle').selectAll('circle')
+        d3.select('#complexDataCircles').selectAll('circle')
             .transition()
             .style('fill', 'none');
     }
