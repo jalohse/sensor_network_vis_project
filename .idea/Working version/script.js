@@ -121,6 +121,11 @@ window.addEventListener('keydown', function (event) {
 
 });
 
+var edgeState = false;
+var faceState = false;
+var coverageState = true;
+var nodeState = true;
+
 appendGroups();
 dataLoader('data/data.off')
 
@@ -716,14 +721,26 @@ function renderPoints() {
 
 function renderView() {
     //query the various view options toggle visibility of each "g" element accordingly
-    f = document.getElementById('coverCheckbox');
-    showCoverage(f.checked);
-    f = document.getElementById('nodeCheckbox');
-    show(f.checked, '.point');
-    f = document.getElementById('edgeCheckbox');
-    show(f.checked, '.edge');
-    f = document.getElementById('faceCheckbox');
-    show(f.checked, '.face');
+    if(document.getElementById('coverCheckbox') != coverageState){
+        f = document.getElementById('coverCheckbox').checked;
+        coverageState = f;
+        showCoverage(f);
+    }
+    if(document.getElementById('nodeCheckbox') != nodeState){
+        f = document.getElementById('nodeCheckbox').checked;
+        nodeState = f;
+        show(f, '.point');
+    }
+    if(document.getElementById('edgeCheckbox') != edgeState){
+        f = document.getElementById('edgeCheckbox').checked;
+        edgeState = f;
+        show(f, '.edge');
+    }
+    if(document.getElementById('faceCheckbox') != faceState){
+        f = document.getElementById('faceCheckbox').checked;
+        faceState = f;
+        show(f, '.face');
+    }
 }
 
 
