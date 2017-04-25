@@ -143,6 +143,16 @@ function appendGroups(){
         .attr('id', 'complexEdges')
         .attr('class', 'edge')
         .style('visibility', 'hidden');
+
+    complexCanvas.append('g')
+        .attr('class', 'circle')
+        .attr('id', 'complexCircles')
+    complexCanvas.append('g')
+        .attr('class', 'point')
+        .attr('id', 'complexPoints');
+    complexCanvas.append('g')
+        .attr('class', 'circle')
+        .attr('id', 'complexDataCircle');
 }
 
 function updateGridLines() {
@@ -597,23 +607,13 @@ function renderPoints() {
 
     //render each point and coverage circle. The id simply corresponds to its index within locationData
 
-    complexCanvas.selectAll('.circle').remove();
-    complexCanvas.selectAll('.point').remove();
-    var complexCircles = complexCanvas.append('g')
-        .attr('class', 'circle')
-        .attr('id', 'complexCircles')
-    var complexPoints = complexCanvas.append('g')
-        .attr('class', 'point')
-        .attr('id', 'complexPoints');
-    var complexAndDataCircle = complexCanvas.append('g')
-        .attr('class', 'circle')
-        .attr('id', 'complexDataCircle');
 
-    var pts = complexPoints.selectAll('circle').data(locationData)
-        .enter()
+    var pts = d3.select('#complexPoints').selectAll('circle').data(locationData);
+    pts.enter()
         .append('circle')
         .style('visibility', 'hidden')
         .attr('class', 'point')
+        .merge(pts)
         .attr('cx', function (d) {
             if (newxScale && newyScale) {
                 return xScale(d.anchor.x) + padding / newZscale;
@@ -641,10 +641,12 @@ function renderPoints() {
             .on('drag', dragNode)
             .on('end', dragEnd))
         .each(function (d) {
-            complexPoints.selectAll('small_circle').data(d.points)
+            var smallData = d3.select('#complexPoints').selectAll('small_circle').data(d.points);
+            smallData
                 .enter()
                 .append('circle')
                 .attr('class', 'small_circle')
+                .merge(smallData)
                 .attr('cx', function (d) {
                     if (newxScale && newyScale) {
                         return xScale(d.x) + padding / newZscale;
@@ -665,13 +667,16 @@ function renderPoints() {
                     return 'complex_small_Point_' + i.toString();
                 })
                 .attr('r', 2 / newZscale);
+            smallData.exit().remove();
         });
+    pts.exit().remove();
 
-    complexCircles.selectAll('circle').data(locationData)
-        .enter()
+    var complexCircles = d3.select('#complexCircles').selectAll('circle').data(locationData);
+    complexCircles.enter()
         .append('circle')
         .style('visibility', 'hidden')
         .attr('class', 'circle')
+        .merge(complexCircles)
         .attr('cx', function (d) {
             return xScale(d.anchor.x) + padding / newZscale;
         })
@@ -682,12 +687,15 @@ function renderPoints() {
             return 'complex_Circle_' + i.toString();
         })
         .attr('r', xScale(complexRadius + xScale.domain()[0]));
+    complexCircles.exit().remove();
 
 
-    complexAndDataCircle.selectAll('circle').data(locationData)
+    var complexAndDataCircle = d3.select('#complexDataCircles').selectAll('circle').data(locationData);
+    complexAndDataCircle
         .enter()
         .append('circle')
         .attr('class', 'circle')
+        .merge(complexAndDataCircle)
         .attr('cx', function (d) {
             return xScale(d.anchor.x) + padding / newZscale;
         })
@@ -700,21 +708,7 @@ function renderPoints() {
         .attr('fill', 'mediumpurple')
         .attr('fill-opacity', 0.1)
         .attr('r', xScale(dataRadius + complexRadius + xScale.domain()[0]));
-
-    // complexPoints.selectAll('text')
-    //     .data(locationData)
-    //     .enter().append('text')
-    //     .text( function (d, i) {
-    //         return i.toString();
-    //     })
-    //     .attr('x', function (d) {
-    //         return d.anchor.x;
-    //     })
-    //     .attr('y', function (d) {
-    //         return d.anchor.y;
-    //     })
-    //     .attr('dx','10px')
-    //     .attr('dy','10px');
+    complexAndDataCircle.exit().remove();
 
     renderView()
 
