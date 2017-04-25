@@ -6,6 +6,9 @@ var width = 600;          //Width of each plot
 var height = 600;         //Height of each plot
 var padding = 30;          //Buffer space to ensure points are adequately
 
+var purpleColor = 'mediumpurple';
+var anchorOpacity = 0.2;
+var extraDataOpacity = 0.1;
 
 //Initialize the data
 var filename = 'data.off';
@@ -115,23 +118,31 @@ window.addEventListener('keydown', function (event) {
         }
 
     }
+
 });
 
+appendGroups();
 dataLoader('data/data.off')
 
-function renderGrid() {
-
-    var xlines = complexSVG.append('g')
+function appendGroups(){
+    complexSVG.append('g')
         .attr('class', 'grid')
         .attr('id', 'xlines');
 
 
-    var ylines = complexSVG.append('g')
+    complexSVG.append('g')
         .attr('class', 'grid')
         .attr('id', 'ylines');
 
-    updateGridLines();
+    complexCanvas.append('g')
+        .attr('id', 'complexFaces')
+        .attr('class', 'face')
+        .style('visibility', 'hidden');
 
+    complexCanvas.append('g')
+        .attr('id', 'complexEdges')
+        .attr('class', 'edge')
+        .style('visibility', 'hidden');
 }
 
 function updateGridLines() {
@@ -240,21 +251,19 @@ function resetPoint() {
     //return point and coverage circle to default view
     d3.select('#complex_Point_' + arguments[1])
         .transition()
-        .style('fill', 'mediumpurple');
+        .style('fill', purpleColor);
+
+    var circle = d3.select('#complex_Circle_' + arguments[1]);
 
     if (document.getElementById('coverCheckbox').checked) {
-        fillColor = 'mediumpurple';
-        fillOpacity = 0.2;
+        circle.transition()
+            .style('fill', purpleColor)
+            .style('fill-opacity', anchorOpacity);
     } else {
-        fillColor = '#fff';
-        fillOpacity = 0;
-    }
-    ;
-
-    d3.select('#complex_Circle_' + arguments[1])
-        .transition()
-        .style('fill', fillColor)
-        .style('fill-opacity', fillOpacity);
+        circle.transition()
+            .style('fill', '#fff')
+            .style('fill-opacity', 0);
+    };
 }
 
 //highlight edge and corresponding points
@@ -269,8 +278,6 @@ function highlightEdge() {
     }
     edge.transition()
         .style('stroke', '#c33');
-
-
 }
 
 //restore default view
@@ -518,21 +525,7 @@ function renderComplex(edges, faces) {
             edges = ripsEdges;
             faces = ripsFaces;
         }
-    }
-    ;
-
-    //remove existing canvas elements
-    complexCanvas.selectAll('.face').remove();
-    complexCanvas.selectAll('.edge').remove();
-    //add group for each layer, this makes it easier to toggle each component on and off
-    var complexFaces = complexCanvas.append('g')
-        .attr('id', 'complexFaces')
-        .attr('class', 'face')
-        .style('visibility', 'hidden');
-    var complexEdges = complexCanvas.append('g')
-        .attr('id', 'complexEdges')
-        .attr('class', 'edge')
-        .style('visibility', 'hidden');
+    };
 
 
 //render faces, give each an id with corresponding vertex indices. This makes it easier to find and highlight the corresponding
@@ -540,9 +533,10 @@ function renderComplex(edges, faces) {
     //has selected
 
 
-    complexFaces.selectAll('polygon').data(faces)
-        .enter().append('polygon')
+    var complexFaces = d3.select('#complexFaces').selectAll('polygon').data(faces);
+    complexFaces.enter().append('polygon')
         .attr('class', 'face')
+        .merge(complexFaces)
         .attr('points', function (d, i) {
                 return (xScale(locationData[d.Pt1].anchor.x) + padding / newZscale) + ',' + (yScale(locationData[d.Pt1].anchor.y) + padding / newZscale) +
                     ' ' + (xScale(locationData[d.Pt2].anchor.x) + padding / newZscale) + ',' + (yScale(locationData[d.Pt2].anchor.y) + padding / newZscale) +
@@ -557,11 +551,13 @@ function renderComplex(edges, faces) {
         })
         .on('mouseover', highlightFace)
         .on('mouseout', resetFace);
+    complexFaces.exit().remove();
 
 
-    complexEdges.selectAll('line').data(edges)
-        .enter().append('line')
+    var complexEdges = d3.select('#complexEdges').selectAll('line').data(edges);
+    complexEdges.enter().append('line')
         .attr('class', 'edge')
+        .merge(complexEdges)
         .style('stroke-width', function (d) {
             return edgeWidthScale(d.Pedge);
         })
@@ -586,6 +582,7 @@ function renderComplex(edges, faces) {
         })
         .on('mouseover', highlightEdge)
         .on('mouseout', resetEdge);
+    complexEdges.exit().remove();
 
 
     //Make sure points stay on top
@@ -1009,7 +1006,7 @@ function dataLoader(file) {
 
         gX.call(xAxis.scale(xScale));
         gY.call(yAxis.scale(yScale));
-        renderGrid();
+        updateGridLines();
 
         //adjust radius slider
         d3.select('#complexInput')
