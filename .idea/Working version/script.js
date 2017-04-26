@@ -612,7 +612,7 @@ function renderPoints() {
 
     //render each point and coverage circle. The id simply corresponds to its index within locationData
 
-
+    var start = performance.now();
     var pts = d3.select('#complexPoints').selectAll('circle').data(locationData);
     pts.enter()
         .append('circle')
@@ -714,6 +714,9 @@ function renderPoints() {
         .attr('fill-opacity', 0.1)
         .attr('r', xScale(dataRadius + complexRadius + xScale.domain()[0]));
     complexAndDataCircle.exit().remove();
+
+    var t1 = performance.now();
+    console.log("Call to doSomething took " + (t1 - start) + " milliseconds.");
 
     renderView()
 
