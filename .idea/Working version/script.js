@@ -827,7 +827,8 @@ function setDataRange(xRange, yRange){
 
 function randomData() {
 //generate uniform random data points
-
+    console.log('random data');
+    start = performance.now();
     var xd = (newxScale) ? newxScale.domain() : xScale.domain();
     var xmin = xd[0] + 0.1 * (xd[1] - xd[0]);
     var xmax = xd[1] - 0.1 * (xd[1] - xd[0]);
