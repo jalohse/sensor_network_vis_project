@@ -616,8 +616,8 @@ function renderPoints() {
     pts.enter()
         .append('circle')
         .style('visibility', 'hidden')
-        .attr('class', 'point')
         .merge(pts)
+        .attr('class', 'point')
         .attr('cx', function (d) {
             if (newxScale && newyScale) {
                 return xScale(d.anchor.x) + padding / newZscale;
