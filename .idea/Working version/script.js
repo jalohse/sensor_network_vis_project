@@ -1428,8 +1428,9 @@ function clearScreen() {
     newyScale = false;
     renderGrid();
 
-    complexRadius = 5;
+    complexRadius = 10;
     numSamples = 0;
+    dataRadius = 5
 
     d3.select('#complexInput')
         .attr('min', 1)
