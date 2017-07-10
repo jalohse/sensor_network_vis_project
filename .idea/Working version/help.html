@@ -9,82 +9,144 @@
 
 <h1>Sensor network generator</h1>
 <h2>User manual</h2>
-This tool allows you to visualize sensor network coverage.
+This tool allows you to visualize sensor network coverage where locations of sensors are unknown.
 
 <h3>Loading data</h3>
-To load data select the "Choose File" button. Browse for the file you wish to load and select "Open". Files must be in
-CSV format with the column headers: LocationID, xf, yf. LocationID is a string containing the label of the node while xf
-and yf refer to the actual node locations.
+Users have the ability to load existing data sets in CSV or JSON formats. The first button in the Control Panel allows a
+user to upload a CSV containing sensor locations with the column headers: LocationID, xf, yf. LocationID is a string
+containing the label of the node while xf and yf refer to the actual node locations.
+<br>
+A JSON file can be used by clicking on the "Open" button. By using this file format, the coverage radius, radius of
+uncertainty, and number of potential locations and their locations can be set.
 
 <h3>Saving data</h3>
-To save your work select the "Save" button. You will be prompted to save the node locations along with several additional
-files containing information on the generated complexes. File naming must be consistent. You may name the primary file
-whatever you like but the supporting file names must not be changed or else they will not load.
+The current layout of sensors in the graphing area can be saved into the correct JSON format by clicking the "Save"
+button. A file named data.json will automatically be downloaded. This same file can be opened with the "Open" button.
 
 <h3>Random data generation</h3>
-You may generate a set of randomly distributed nodes by selecting the "Generate random data" button. Enter the number of
-desired nodes in the "# sensors" box up to 250. Note that selecting a number of nodes greater than approximately ~150 will
-slow down all computations.
+Users have the ability to generate random sensor locations by clicking on the "Random Data" button. By changing the
+number in the user-editable text box below the button, users can control how many sensors appear based on their
+preferences. Note that selecting a number of nodes greater than approximately ~150 will slow down all computations.
 
 <h3>Data Editing</h3>
 
 <p>
-    <b>Moving nodes.</b> To move a node simply drag and drop. The location and coverage circle will move along with the mouse.
-    After you have dropped the node into the new location the complex will be recalculated and rendered.
+    <b>Moving nodes.</b>
+    Moving an existing node can be accomplished by simply clicking on a node and then dragging the node
+    to the desired location. The location and coverage circles will move along with the mouse.
+    After the node is dropped into the new location the complex will be recalculated and rendered.
 </p>
 
 <p>
-    <b>Deleting nodes.</b> To delete nodes simply click to highlight each node you wish to remove and press the "Delete"
-    key. To cancel press the "Esc" key.
+    <b>Deleting nodes.</b>
+    Users can also select a node by clicking on it. Pressing the "delete" key on their keyboard
+    will delete the node. To cancel or exit press the "esc" key.
 </p>
 
 <p>
-    <b>Adding nodes.</b> To add nodes click the "Add nodes" button. The cursor will change to a crosshair. Click the location
-    for each node you would like to add. When you are done press the "Esc" key.
+    <b>Adding nodes.</b>
+    To add a node, a user must click on the "Add node" button in the control panel. Their cursor will change to a
+    crosshairs and upon clicking on a location in the graphing area a node will appear and the complex updated. Pressing
+    the "esc" key will exit out of this mode.
 </p>
 
-<h3>Changing coverage radius.</h3>
+<p>
+    <b>Updating potential locations.</b>
+    Each sensor also has a certain number of potential locations. By pressing the "Update" button, the potential
+    locations for each sensor are given new random coordinates within the radius of uncertainty. The number of potential
+    locations can be updated in the same way as the number of sensors, by updating the number in the text box and
+    clicking the "Update" button.
+</p>
 
-Dragging the "Radius" slider will dynamically change the coverage radius for all nodes and update the complex accordingly.
+<h3>Changing Radii.</h3>
+
+<p>
+    <b>Updating coverage radius.</b>
+    Tied to sensor locations is the coverage radius of each sensor. This can be updated by
+    either adjusting the slider under the "Coverage radius" heading or updating the value in the
+    text box below it. The maximum value for the coverage radius is initialized as the the larger
+    value between the specified value given in the load configuration and half of the largest range
+    between sensors on the x-axis. This maximum value can also be changed by clicking on the
+    "Max" button and typing in the desired maximum radius.
+</p>
+
+<p>
+    <b>Updating radius of uncertainty.</b>
+    The radius of uncertainty is the radius from the anchor location that potential locations
+    can exist in. This radius can be changed just as the coverage radius changes: either by moving
+    the slider or updating the value in the text box. The maximum radius of uncertainty is set to
+    fifty. The radius of uncertainty is initially set to ten. If the radius is increased, the potential
+    locations will not update, unless the "Update" button is pressed. Decreasing the radius of
+    uncertainty below ten will recalculate potential locations.
+</p>
 
 <h3>View options</h3>
 There are several options for visualizing network coverage. To add or remove each layer from the canvas simply toggle
 the corresponding checkbox.
 
 <p>
-    <b>Zooming and panning.</b> To enter zoom mode, press the "Z" key. While in zoom mode you may pan the plot view by left-clicking,
-    holding the mouse button down and moving the mouse in the plot area. To zoom in or out use the mouse wheel.
+    <b>Nodes</b> correspond to sensor locations. Hovering over a node will highlight the coverage radius for that
+    individual sensor.
 </p>
 
 <p>
-    <b>Nodes</b> correspond to sensor locations. Hovering over a node will
-    highlight the coverage radius for that individual sensor.
+    <b>Potential nodes</b> correspond to the randomly placed potential locations for each node.
 </p>
 
 <p>
-    <b>Edges</b> correspond to the lines connecting each node. An edge only exists if the coverage radii overlap for two nodes.
-    Hovering over an edge will highlight the edge and its corresponding nodes.
+    <b>Node coverage </b> corresponds to the transparent purple circles. The smaller of these circles designates the
+    node coverage radius, while the larger represents the coverage radius plus the radius of uncertainty.
 </p>
 
 <p>
-    <b>Faces</b> correspond to filled triangles indicating where three points are mutually connected. Hovering over a face
-    will highlight the face along with the corresponding three points and edges that form the triangle. The presence of a face
-    depends on which complex type you select:
+    <b>Edges</b> correspond to the lines connecting each node, colored by their probability. An edge only exists if the
+    coverage radii overlap for two nodes. Hovering over an edge will highlight the edge and its corresponding nodes. A
+    small information box will appear near the cursor displaying the probability of that edge.
+</p>
+
+<p>
+    <b>Possible edges</b> correspond to the edges that exist between potential locations within the coverage radii.
+    Potential edges are shown as black lines.
+</p>
+
+<p>
+    <b>Faces</b> correspond to filled triangles indicating where three points are mutually connected, colored by their
+    probability. Hovering over a face will highlight the face along with the corresponding three points and edges that
+    form the triangle. A small information box will appear near the cursor displaying the probability of that face. </p>
+
+<p>The presence of a face depends on which complex type you select: </p>
+<BLOCKQUOTE>
+    <b>&#268;ech</b> pertains to a simplicial complex constructed such that where the coverage for each of the three
+    nodes overlaps. "Good" coverage can be guaranteed here and represents the geometric area as a face or 2-simplex in
+    topological space.
+    (<a href="https://en.wikipedia.org/wiki/%C4%8Cech_cohomology">Reference</a>)
     <br>
     <br>
-    <b>&#268;ech</b> pertains to a simplicial complex constructed such that where the coverage for each of the three nodes overlaps,
-    we can guarantee "good" coverage and represent this geometric area as a face or 2-simplex in topological space. (
-    <a href="https://en.wikipedia.org/wiki/%C4%8Cech_cohomology">Reference</a>)
-    <br>
-    <br>
-    <b>Vietoris-Rips</b> is another, less computationally expensive way of calculating coverage. In this simplicial complex, faces
-    are generated when 3 points are all pairwise within range of each other with no requirement that all three nodes simultaneously overlap.
-    The advantage of this over the &#268;ech complex is that it is computationally much less expensive. The disadvantage lies in the fact that
-    there is the possibility of small coverage gaps within each face where the coverage radii do not all intersect the circumcenter of the resulting triangle
+    <b>Vietoris-Rips</b> is another, less computationally expensive way of calculating coverage. In this simplicial
+    complex, faces
+    are generated when 3 points are all pairwise within range of each other with no requirement that all three nodes
+    simultaneously overlap.
+    The advantage of this over the &#268;ech complex is that it is computationally less expensive. The
+    disadvantage lies in the fact that there is the possibility of small coverage gaps within each face where the
+    coverage radii do not all intersect the circumcenter of the resulting triangle
     in geometric space. (<a href="https://en.wikipedia.org/wiki/Vietoris%E2%80%93Rips_complex">Reference</a>)
-</p>
+</BLOCKQUOTE>
+
+<h3>Color maps</h3>
+Below the graphing area is the legend that shows the color maps for face and edge probability. There are
+five choices for the face color map: yellow to blue, yellow to red, blue to purple, red, and
+green. A different color map can be chosen by simply selecting the desired map in the dropdown menu. The range of
+probability is split between seven different classes. The edge color map changes based on the selection for maximum
+contrast. The edge color map is split between five classes across the probability range.
+
+<h3>Zooming and panning.</h3>
+A user must furst hit the "Z" key on their keyboard. This will change their cursor to a four-way directional
+arrow. By scrolling the wheel of the mouse the graphing area can zoom in and out. This mode also allows users to
+drag the graphing area around by simply clicking and dragging. To exit this mode, press the "Z" key on the keyboard
+again.
+
 <br><br><br>
 
-By Tim Sodergren, 2016. Special thanks to Dan Maljovec for providing the original code this interface was adapted from.
+
 </body>
 </html>
