@@ -24,6 +24,7 @@ var ripsEdges = [];
 var allEdges = [];
 var dataMin = 0;
 var distances = [];
+var a_edges = 0;
 
 var numSamples = 0;      //Number of points to use
 var complexRadius = 20;          //epsilon ball radius
@@ -335,30 +336,50 @@ function zoomed() {
 //this function is called whenever the data are changed.
 
 function updateComplex(newValue) {
+
+    complexSVG.attr('cursor', 'wait')
+
     //update coverage radius and recompute complexes
+    newValue = +newValue;
 
+    //determine if radius has increased or decreased
+    var radiusChange = 0;
+    if (newValue > complexRadius) {
+        radiusChange = 1;
+    } else if (newValue < complexRadius) {
+        radiusChange = -1;
+    }
 
-    //update slider value and/or tex value
-    complexRadius=+newValue;
+    //update slider value and/or text value
+    complexRadius = newValue;
     d3.select('#complexRadius').node().value =  complexRadius;
     d3.select('#complexInput').node().value = complexRadius;
+
+
+    //recompute complexes
+    var t = Date.now();
+
+
+    if (radiusChange == 1) {
+        constructRips(radiusChange)
+    } else {
+        constructRips();
+    }
+
+    var t2 = Date.now() - t;
+    console.log('compute: ' + t2);
+
 
     //adjust inner and outer coverage disks
     var innerRadius = xScale(complexRadius - dataRadius + xScale.domain()[0]);
     var outerRadius = xScale(complexRadius + dataRadius + xScale.domain()[0]);
     d3.select('#complexCircles').selectAll('circle').attr('r', innerRadius);
     d3.select('#complexDataCircle').selectAll('circle').attr('r', outerRadius);
-
-    //recompute complexes
-    var t = Date.now();
-    constructRips();
-    var t2 = Date.now() - t;
-    console.log('compute: ' + t2);
-
-
     changeComplex();
     var t3 = Date.now() - t - t2;
     console.log('render: ' + t3)
+
+    complexSVG.attr('cursor', null)
 }
 
 //graphical highlighting
@@ -539,233 +560,6 @@ function resetFace() {
 
 }
 
-//construct the Cech complex
-function constructCech() {
-
-    cechEdges = ripsEdges.slice();
-    var tempFaces = JSON.parse(JSON.stringify(ripsFaces));
-    cechFaces = [];
-
-    var sqDist;
-    //calculate the squared diameter to compare each pair to. Use square diameter to compare to squared euclidean distanct
-    //of each pair so save computation.
-    sqDiameter = 4 * Math.pow(complexRadius, 2);
-
-    tempFaces.forEach( function(d, i) {
-        d.Pface = 0;
-        count = 0;
-        for (j=0; j<d.allFaces.length; j++) {
-            x1 = locationData[d.Pt1].points[d.allFaces[j][0]].x;
-            y1 = locationData[d.Pt1].points[d.allFaces[j][0]].y;
-            x2 = locationData[d.Pt2].points[d.allFaces[j][1]].x;
-            y2 = locationData[d.Pt2].points[d.allFaces[j][1]].y;
-            x3 = locationData[d.Pt3].points[d.allFaces[j][2]].x;
-            y3 = locationData[d.Pt3].points[d.allFaces[j][2]].y;
-            d12 = sqEuclidDist([x1, y1], [x2, y2]);
-            d23 = sqEuclidDist([x2, y2], [x3, y3]);
-            d13 = sqEuclidDist([x1, y1], [x3, y3]);
-
-            //determine longest edge
-            if (d12 >= d13 && d12 >= d23) {
-                xc = (x2 + x1) / 2;
-                yc = (y2 + y1) / 2;
-                dist = Math.sqrt(sqEuclidDist([x3, y3], [xc, yc]));
-                testRadius = Math.sqrt(d12) / 2;
-            } else if (d13 >= d12 && d13 >= d23) {
-                xc = (x3 + x1) / 2;
-                yc = (y3 + y1) / 2;
-                dist = Math.sqrt(sqEuclidDist([x2, y2], [xc, yc]));
-                testRadius = Math.sqrt(d13) / 2;
-            } else {
-                xc = (x3 + x2) / 2;
-                yc = (y3 + y2) / 2;
-                dist = Math.sqrt(sqEuclidDist([x1, y1], [xc, yc]));
-                testRadius = Math.sqrt(d23) / 2;
-            }
-
-            if (dist <= testRadius) {
-                //determine if third point is within circumcircle of longest edge
-                count++
-            } else {
-                //otherwise determine if circumcircle radius is smaller than the coverage radius
-                a = Math.sqrt(d12);
-                b = Math.sqrt(d13);
-                c = Math.sqrt(d23);
-                testRadius = (a * b * c) / Math.sqrt((a + b + c) * (b + c - a) * (a + c - b) * (a + b - c));
-                if (testRadius <= complexRadius) {
-                    count++
-                }
-            }
-        }
-        p = count/Math.pow(numPoints,3);
-        if (p > 0) {
-            d.Pface = p;
-            cechFaces.push(d)
-        }
-    })
-
-
-}
-
-function constructEdges() {
-
-    var sqDiameter = 4 * Math.pow(complexRadius, 2);
-    var sqDiameterMin = 4 * Math.pow(complexRadius-dataRadius, 2);
-    var sqDiameterMax = 4 * Math.pow(complexRadius+dataRadius, 2);
-    var edgeProb = [];
-    var tempEdges = [];
-    var count, p, pFlag;
-
-    locationData.forEach( function (d) {
-        d.star = {edges: [], faces: []};
-        d.link = {points: [], edges: []}
-    })
-
-
-    for (i = 0; i < numSamples - 1; i++) {
-        x1 = locationData[i].anchor.x;
-        y1 = locationData[i].anchor.y;
-        edgeProb.push([0]);
-        for (j = i + 1; j < numSamples; j++) {
-            x2 = locationData[j].anchor.x;
-            y2 = locationData[j].anchor.y;
-            d12 = sqEuclidDist([x1, y1], [x2, y2]);
-            if (d12 <= sqDiameterMin) {
-                edgeProb[i].push({p: 1, edgeInd: tempEdges.length})
-                locationData[i].star.edges.push(tempEdges.length)
-                locationData[i].link.points.push([j])
-                locationData[j].star.edges.push(tempEdges.length)
-                locationData[j].link.points.push([i])
-                tempEdges.push({Pt1: i, Pt2: j, Pedge: 1})
-            } else if (d12 > sqDiameterMax){
-                edgeProb[i].push({p: 0})
-            } else {
-                count = 0;
-                pFlag = [];
-                iEdges = [];
-                for (m=0; m<numPoints; m++) {
-                    x1 = locationData[i].points[m].x;
-                    y1 = locationData[i].points[m].y;
-                    for (n=0; n<numPoints; n++) {
-                        x2 = locationData[j].points[n].x;
-                        y2 = locationData[j].points[n].y;
-                        d12 = sqEuclidDist([x1, y1],[x2,y2]);
-                        if (d12 <= sqDiameter) {
-                            count++
-                            pFlag.push(true)
-                            iEdges.push({Pt1: m, Pt2: n})
-                        } else {
-                            pFlag.push(false)
-                        }
-                    }
-                }
-                p = count/(numPoints*numPoints);
-                edgeProb[i].push({p: p, pFlag: pFlag, edgeInd: tempEdges.length})
-                if (p>0) {
-                    locationData[i].star.edges.push(tempEdges.length)
-                    locationData[i].link.points.push([j])
-                    locationData[j].star.edges.push(tempEdges.length)
-                    locationData[j].link.points.push([i])
-                    tempEdges.push({Pt1: i, Pt2: j, Pedge: p, iEdges: iEdges})
-                }
-            }
-        }
-    }
-
-
-
-    //Put all individual edges into a single structure for easier access.
-    allEdges = [];
-    tempEdges.forEach( function(d) {
-        if (d.Pedge == 1) {
-            for (i=0; i<numPoints; i++) {
-                for (j=0; j<numPoints; j++) {
-                    x1 = locationData[d.Pt1].points[i].x;
-                    y1 = locationData[d.Pt1].points[i].y;
-                    x2 = locationData[d.Pt2].points[j].x;
-                    y2 = locationData[d.Pt2].points[j].y;
-                    allEdges.push({x1: x1, y1: y1, x2: x2, y2: y2})
-                }
-            }
-        } else {
-            for (i=0; i<d.iEdges.length; i++) {
-                x1 = locationData[d.Pt1].points[d.iEdges[i].Pt1].x;
-                y1 = locationData[d.Pt1].points[d.iEdges[i].Pt1].y;
-                x2 = locationData[d.Pt2].points[d.iEdges[i].Pt2].x;
-                y2 = locationData[d.Pt2].points[d.iEdges[i].Pt2].y;
-                allEdges.push({x1: x1, y1: y1, x2: x2, y2: y2})
-            }
-        }
-    })
-
-    return {edges: tempEdges, edgeProb: edgeProb}
-
-}
-
-function constructRips() {
-
-    var tempFaces = [];
-    ripsFaces = [];
-    var tmp = constructEdges();
-    ripsEdges = tmp.edges.slice();
-    var edgeProb = tmp.edgeProb.slice();
-
-
-    var faceProb = [];
-    for (i=0; i<numSamples-2; i++) {
-        for (j=i+1; j<numSamples-1; j++) {
-            if (edgeProb[i][j-i].p > 0) {
-                for (k=j+1; k<numSamples; k++) {
-                    if (edgeProb[j][k-j].p == 1 && edgeProb[i][k-i].p == 1 && edgeProb[i][j-i].p == 1){
-                        tempFaces.push({Pt1: i, Pt2: j, Pt3: k, Pface: 1})
-                        faceProb.push(1)
-                    } else if (edgeProb[j][k-j].p > 0 && edgeProb[i][k-i].p > 0){
-                        tempFaces.push({Pt1: i, Pt2: j, Pt3: k, p12: edgeProb[i][j-i], p13: edgeProb[i][k-i], p23: edgeProb[j][k-j]})
-                        faceProb.push(0)
-                    }
-                }
-            }
-        }
-    }
-
-    tempFaces.forEach( function (d, ind) {
-        var count = 0;
-        var allFaces = [];
-        for (i=0; i<numPoints; i++) {
-            for (j=0; j<numPoints; j++) {
-                for (k=0; k<numPoints; k++) {
-                    isEdge = [true, true, true];
-                    if (faceProb[ind] == 0) {
-                        if (d.p12.p < 1) {
-                            isEdge[0] = d.p12.pFlag[i * numPoints + j] ? true : false;
-                        }
-                        if (d.p13.p < 1) {
-                            isEdge[1] = d.p13.pFlag[i * numPoints + k] ? true : false;
-                        }
-                        if (d.p23.p < 1) {
-                            isEdge[2] = d.p23.pFlag[j * numPoints + k] ? true : false;
-                        }
-                    }
-                    if (isEdge[0] && isEdge[1] && isEdge[2]) {
-                        allFaces.push([i, j, k])
-                        count++
-                    }
-                }
-            }
-        }
-        p = count/Math.pow(numPoints,3);
-        d.allFaces = allFaces;
-
-        if (p>0) {
-            d.Pface = p;
-            ripsFaces.push(d);
-        }
-    })
-
-    constructCech()
-
-}
-
 
 function renderComplex(edges,faces) {
 
@@ -870,14 +664,6 @@ function renderFaces(){
         faces = ripsFaces;
     }
     faces.sort( function (a, b) { return a.Pface - b.Pface } )
-    faces.forEach( function (d, i) {
-        locationData[d.Pt1].link.edges.push([d.Pt2, d.Pt3])
-        locationData[d.Pt1].star.faces.push(i)
-        locationData[d.Pt2].link.edges.push([d.Pt1, d.Pt3])
-        locationData[d.Pt2].star.faces.push(i)
-        locationData[d.Pt3].link.edges.push([d.Pt1, d.Pt2])
-        locationData[d.Pt3].star.faces.push(i)
-    })
 
     complexCanvas.selectAll('.face').remove();
     var complexFaces = complexCanvas.select('g#complexFaces');
@@ -1190,6 +976,8 @@ function randomData() {
     numSamples = +document.getElementById('numSensors').value;
 
     locationData = [];
+    a_edges = 0;
+    // console.log(a_edges)
 
     for (i=0; i<numSamples; i++) {
         var xi = Math.random() * (xmax - xmin + 1)  + xmin;
@@ -1199,13 +987,13 @@ function randomData() {
 
     perturbData();
 
-    dataRange = d3.max([xd[1]-xd[0], yd[1]-yd[0]]);
-    dataPadding = 0.1*dataRange;
-
-    d3.select('#complexInput')
-        .attr('min', 0.05*dataRange)
-        .attr('max', 0.5*dataRange)
-        .attr('value', 0.2*dataRange);
+    // dataRange = d3.max([xd[1]-xd[0], yd[1]-yd[0]]);
+    // dataPadding = 0.1*dataRange;
+    //
+    // d3.select('#complexInput')
+    //     .attr('min', 0.05*dataRange)
+    //     .attr('max', 0.5*dataRange)
+    //     .attr('value', 0.2*dataRange);
 
     resetCheckboxes();
 
@@ -1215,8 +1003,14 @@ function randomData() {
 
 function saveData() {
 
-    var data = {n: numSamples, k: numPoints, r: complexRadius, eps: dataRadius, sensors: locationData,
-        allEdges: allEdges, cechComplex: [cechEdges, cechFaces], ripsComplex: [ripsEdges, ripsFaces]};
+    var data = {
+        n: numSamples, k: numPoints, r: complexRadius, eps: dataRadius, sensors: locationData,
+        allEdges: allEdges, cechComplex: [cechEdges, cechFaces], ripsComplex: [ripsEdges, ripsFaces],
+        edgeProb: a_edges.edgeProb.toJSON(), edgeAnchorDist: a_edges.edgeAnchorDist.toJSON(),
+        edgeFlag: a_edges.edgeFlag.toJSON(), edgeDist: a_edges.edgeDist.toJSON(),
+        edgeInd: a_edges.edgeInd.toJSON()
+    };
+
     var tempData = JSON.stringify(data, null, 2);
 
 
@@ -1266,6 +1060,11 @@ function dataLoader(file){
         cechEdges = data.cechComplex[0];
         cechFaces = data.cechComplex[1];
 
+        a_edges = {edgeProb: JSON.parse(JSON.stringify(data.edgeProb),math.json.reviver),
+            edgeAnchorDist: JSON.parse(JSON.stringify(data.edgeAnchorDist),math.json.reviver),
+            edgeFlag: JSON.parse(JSON.stringify(data.edgeFlag),math.json.reviver),
+            edgeDist: JSON.parse(JSON.stringify(data.edgeDist),math.json.reviver),
+            edgeInd: JSON.parse(JSON.stringify(data.edgeInd),math.json.reviver)};
 
         //set data scale
 
@@ -1301,18 +1100,21 @@ function dataLoader(file){
         renderGrid()
 
         //adjust radius slider
+        //console.log(complexRadius)
         d3.select('#complexInput')
             .attr('min', 1)
             .attr('max', rmax);
         d3.select('#complexRadius')
             .attr('min', 1)
             .attr('max', rmax);
-
       d3.select('#complexInput').node().value = complexRadius;
       d3.select('#complexRadius').node().value = complexRadius;
       d3.select('#numSensors').node().value = numSamples;
       d3.select('#numSampleSensors').node().value = numPoints;
       d3.select('#complexDataRadius').node().value = dataRadius;
+
+        d3.select('#complexRadius').node().value =  complexRadius;
+        d3.select('#complexInput').node().value = complexRadius;
 
         resetCheckboxes();
 
@@ -1352,11 +1154,11 @@ function addSampleSensors(){
 
     renderPoints();
 
-    if (complexType=='Cech') {
-        constructCech();
-    } else if (complexType=='Vietoris-Rips') {
-        constructRips();
-    }
+    // if (complexType=='Cech') {
+    //     constructCech();
+    // } else if (complexType=='Vietoris-Rips') {
+    //     constructRips();
+    // }
     changeComplex();
 }
 
@@ -1388,7 +1190,6 @@ function changeComplex() {
 
     d = document.getElementsByName('complexType');
     if (d[0].checked) {
-        console.log('here')
         complexType = 'Cech'
         renderComplex(cechEdges, cechFaces);
     } else {
@@ -1627,8 +1428,9 @@ function clearScreen() {
     newyScale = false;
     renderGrid();
 
-    complexRadius = 5;
+    complexRadius = 10;
     numSamples = 0;
+    dataRadius = 5
 
     d3.select('#complexInput')
         .attr('min', 1)
