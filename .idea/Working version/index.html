@@ -15,6 +15,9 @@
 </head>
 <body>
 
+<div class="helplink">
+  <a href="help.html" class="helplink" target="_blank">Help</a>
+</div>
 <table>
   <tr>
     <td id="plotArea" width="85%" style="border: 1px solid black; background-color: white" rowspan="2"></td>
@@ -50,7 +53,7 @@
       <p>
         <button type="button" name="numSamplesButton" id="numSamplesButton" class="inputfile" onclick="changeNumberSampleSensors()">Number of Sensor Samples</button>
         <label for="numSamplesButton">Update </label>
-      <br>
+        <br>
         # potential locations per sensor:
         <input type="number" name="numSampleSensors" id="numSampleSensors" value="8" min="1" max="1000">
       </p>
@@ -119,11 +122,11 @@
       </table>
 
     </td>
-   <!--<td>-->
-      <!--<p>-->
-        <!--<button type="button" name="queryButton" id="queryButton" class="inputfile" onclick="queryProb()">Query</button>-->
-        <!--<label for="queryButton">Query</label>-->
-      <!--</p>-->
+    <!--<td>-->
+    <!--<p>-->
+    <!--<button type="button" name="queryButton" id="queryButton" class="inputfile" onclick="queryProb()">Query</button>-->
+    <!--<label for="queryButton">Query</label>-->
+    <!--</p>-->
     <!--</td>-->
   </tr>
 </table>
@@ -131,8 +134,9 @@
 <!--this button is for testing components, keep hidden when not in use-->
 <button type="button" onclick="clearScreen()">Clear</button>
 <br><br>
-<a href="help.html" class="helplink" target="blank5">Help</a>
+
 
 <script src="script.js"></script>
 </body>
+<footer>&copy; 2017, by Tim Sodergren and Jessica Hair.</footer>
 </html>
