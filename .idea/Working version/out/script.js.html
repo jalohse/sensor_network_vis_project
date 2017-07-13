@@ -1,4 +1,32 @@
-//
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: script.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: script.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>//
 //Created by Tim on 11/10/2016.
 //
 // Common variables and functions used by all of the example plots
@@ -473,7 +501,7 @@ function highlightEdge() {
 
     var data = arguments[0];
 
-    if(this.className != "individual_edge" && data.hasOwnProperty("Pedge")){
+    if(this.className != "individual_edge" &amp;&amp; data.hasOwnProperty("Pedge")){
         showToolTip('Edge', data.Pedge);
     }
 
@@ -510,7 +538,7 @@ function resetEdge() {
     } else {
         edge = d3.select(arguments[0]);
         var points = arguments[0].replace(/#complex_Edge_/, '');
-        for (i = 0; i < ripsEdges.length; i++){
+        for (i = 0; i &lt; ripsEdges.length; i++){
             var possibleEdge = ripsEdges[i];
             if(points == possibleEdge.Pt1 + "_" + possibleEdge.Pt2){
                 edge.transition()
@@ -621,15 +649,15 @@ function constructEdges() {
     })
 
 
-    for (i = 0; i < numSamples - 1; i++) {
+    for (i = 0; i &lt; numSamples - 1; i++) {
         x1 = locationData[i].anchor.x;
         y1 = locationData[i].anchor.y;
         edgeProb.push([0]);
-        for (j = i + 1; j < numSamples; j++) {
+        for (j = i + 1; j &lt; numSamples; j++) {
             x2 = locationData[j].anchor.x;
             y2 = locationData[j].anchor.y;
             d12 = sqEuclidDist([x1, y1], [x2, y2]);
-            if (d12 <= sqDiameterMin) {
+            if (d12 &lt;= sqDiameterMin) {
                 edgeProb[i].push({p: 1, edgeInd: tempEdges.length})
                 locationData[i].star.edges.push(tempEdges.length)
                 locationData[i].link.points.push([j])
@@ -642,14 +670,14 @@ function constructEdges() {
                 count = 0;
                 pFlag = [];
                 iEdges = [];
-                for (m=0; m<numPoints; m++) {
+                for (m=0; m&lt;numPoints; m++) {
                     x1 = locationData[i].points[m].x;
                     y1 = locationData[i].points[m].y;
-                    for (n=0; n<numPoints; n++) {
+                    for (n=0; n&lt;numPoints; n++) {
                         x2 = locationData[j].points[n].x;
                         y2 = locationData[j].points[n].y;
                         d12 = sqEuclidDist([x1, y1],[x2,y2]);
-                        if (d12 <= sqDiameter) {
+                        if (d12 &lt;= sqDiameter) {
                             count++
                             pFlag.push(true)
                             iEdges.push({Pt1: m, Pt2: n})
@@ -680,8 +708,8 @@ function constructEdges() {
     allEdges = [];
     tempEdges.forEach( function(d) {
         if (d.Pedge == 1) {
-            for (i=0; i<numPoints; i++) {
-                for (j=0; j<numPoints; j++) {
+            for (i=0; i&lt;numPoints; i++) {
+                for (j=0; j&lt;numPoints; j++) {
                     x1 = locationData[d.Pt1].points[i].x;
                     y1 = locationData[d.Pt1].points[i].y;
                     x2 = locationData[d.Pt2].points[j].x;
@@ -690,7 +718,7 @@ function constructEdges() {
                 }
             }
         } else {
-            for (i=0; i<d.iEdges.length; i++) {
+            for (i=0; i&lt;d.iEdges.length; i++) {
                 x1 = locationData[d.Pt1].points[d.iEdges[i].Pt1].x;
                 y1 = locationData[d.Pt1].points[d.iEdges[i].Pt1].y;
                 x2 = locationData[d.Pt2].points[d.iEdges[i].Pt2].x;
@@ -718,14 +746,14 @@ function constructRips() {
 
 
     var faceProb = [];
-    for (i=0; i<numSamples-2; i++) {
-        for (j=i+1; j<numSamples-1; j++) {
+    for (i=0; i&lt;numSamples-2; i++) {
+        for (j=i+1; j&lt;numSamples-1; j++) {
             if (edgeProb[i][j-i].p > 0) {
-                for (k=j+1; k<numSamples; k++) {
-                    if (edgeProb[j][k-j].p == 1 && edgeProb[i][k-i].p == 1 && edgeProb[i][j-i].p == 1){
+                for (k=j+1; k&lt;numSamples; k++) {
+                    if (edgeProb[j][k-j].p == 1 &amp;&amp; edgeProb[i][k-i].p == 1 &amp;&amp; edgeProb[i][j-i].p == 1){
                         tempFaces.push({Pt1: i, Pt2: j, Pt3: k, Pface: 1})
                         faceProb.push(1)
-                    } else if (edgeProb[j][k-j].p > 0 && edgeProb[i][k-i].p > 0){
+                    } else if (edgeProb[j][k-j].p > 0 &amp;&amp; edgeProb[i][k-i].p > 0){
                         tempFaces.push({Pt1: i, Pt2: j, Pt3: k, p12: edgeProb[i][j-i], p13: edgeProb[i][k-i], p23: edgeProb[j][k-j]})
                         faceProb.push(0)
                     }
@@ -737,22 +765,22 @@ function constructRips() {
     tempFaces.forEach( function (d, ind) {
         var count = 0;
         var allFaces = [];
-        for (i=0; i<numPoints; i++) {
-            for (j=0; j<numPoints; j++) {
-                for (k=0; k<numPoints; k++) {
+        for (i=0; i&lt;numPoints; i++) {
+            for (j=0; j&lt;numPoints; j++) {
+                for (k=0; k&lt;numPoints; k++) {
                     isEdge = [true, true, true];
                     if (faceProb[ind] == 0) {
-                        if (d.p12.p < 1) {
+                        if (d.p12.p &lt; 1) {
                             isEdge[0] = d.p12.pFlag[i * numPoints + j] ? true : false;
                         }
-                        if (d.p13.p < 1) {
+                        if (d.p13.p &lt; 1) {
                             isEdge[1] = d.p13.pFlag[i * numPoints + k] ? true : false;
                         }
-                        if (d.p23.p < 1) {
+                        if (d.p23.p &lt; 1) {
                             isEdge[2] = d.p23.pFlag[j * numPoints + k] ? true : false;
                         }
                     }
-                    if (isEdge[0] && isEdge[1] && isEdge[2]) {
+                    if (isEdge[0] &amp;&amp; isEdge[1] &amp;&amp; isEdge[2]) {
                         allFaces.push([i, j, k])
                         count++
                     }
@@ -773,7 +801,7 @@ function constructRips() {
 }
 
 /**
- * Construct the &#268;ech complex. For each face determined from the Vietoris-Rips complex, test whether all three points
+ * Construct the &amp;#268;ech complex. For each face determined from the Vietoris-Rips complex, test whether all three points
  * have a common intersection. Computes a probability for each face.
  */
 function constructCech() {
@@ -790,7 +818,7 @@ function constructCech() {
     tempFaces.forEach( function(d, i) {
         d.Pface = 0;
         count = 0;
-        for (j=0; j<d.allFaces.length; j++) {
+        for (j=0; j&lt;d.allFaces.length; j++) {
             x1 = locationData[d.Pt1].points[d.allFaces[j][0]].x;
             y1 = locationData[d.Pt1].points[d.allFaces[j][0]].y;
             x2 = locationData[d.Pt2].points[d.allFaces[j][1]].x;
@@ -802,12 +830,12 @@ function constructCech() {
             d13 = sqEuclidDist([x1, y1], [x3, y3]);
 
             //determine longest edge
-            if (d12 >= d13 && d12 >= d23) {
+            if (d12 >= d13 &amp;&amp; d12 >= d23) {
                 xc = (x2 + x1) / 2;
                 yc = (y2 + y1) / 2;
                 dist = Math.sqrt(sqEuclidDist([x3, y3], [xc, yc]));
                 testRadius = Math.sqrt(d12) / 2;
-            } else if (d13 >= d12 && d13 >= d23) {
+            } else if (d13 >= d12 &amp;&amp; d13 >= d23) {
                 xc = (x3 + x1) / 2;
                 yc = (y3 + y1) / 2;
                 dist = Math.sqrt(sqEuclidDist([x2, y2], [xc, yc]));
@@ -819,7 +847,7 @@ function constructCech() {
                 testRadius = Math.sqrt(d23) / 2;
             }
 
-            if (dist <= testRadius) {
+            if (dist &lt;= testRadius) {
                 //determine if third point is within circumcircle of longest edge
                 count++
             } else {
@@ -828,7 +856,7 @@ function constructCech() {
                 b = Math.sqrt(d13);
                 c = Math.sqrt(d23);
                 testRadius = (a * b * c) / Math.sqrt((a + b + c) * (b + c - a) * (a + c - b) * (a + b - c));
-                if (testRadius <= complexRadius) {
+                if (testRadius &lt;= complexRadius) {
                     count++
                 }
             }
@@ -869,7 +897,7 @@ function renderComplex(edges,faces) {
     //     })
     //
     //     locationData[d.Pt2].star.faces.forEach( function (e) {
-    //         if (d.star.faces.indexOf(e) == -1 && d.link.faces.indexOf(e) == -1) {
+    //         if (d.star.faces.indexOf(e) == -1 &amp;&amp; d.link.faces.indexOf(e) == -1) {
     //             d.link.faces.push(e)
     //         }
     //     })
@@ -1042,7 +1070,7 @@ function renderPoints() {
         .style('visibility','hidden')
         .attr('class', 'point')
         .attr('cx', function (d) {
-            if (newxScale && newyScale) {
+            if (newxScale &amp;&amp; newyScale) {
                 return xScale(d.anchor.x) + padding/newZscale;
             }
             else {
@@ -1050,7 +1078,7 @@ function renderPoints() {
             }
         })
         .attr('cy', function (d) {
-            if (newxScale && newyScale) {
+            if (newxScale &amp;&amp; newyScale) {
                 return yScale(d.anchor.y) + padding/newZscale;
             }
             else {
@@ -1073,7 +1101,7 @@ function renderPoints() {
                 .append('circle')
                 .attr('class', 'small_circle')
                 .attr('cx', function (d) {
-                    if (newxScale && newyScale) {
+                    if (newxScale &amp;&amp; newyScale) {
                         return xScale(d.x) + padding/newZscale;
                     }
                     else {
@@ -1081,7 +1109,7 @@ function renderPoints() {
                     }
                 })
                 .attr('cy', function (d) {
-                    if (newxScale && newyScale) {
+                    if (newxScale &amp;&amp; newyScale) {
                         return yScale(d.y) + padding/newZscale;
                     }
                     else {
@@ -1203,7 +1231,7 @@ function updateScales(xMin, xMax, yMin, yMax){
 
 /**
  * Import anchor locations from a CSV file.
- * <br><br>
+ * &lt;br>&lt;br>
  * Files must contain, at a minimum, a column labeled "xf" and a column labeled "yf" with scalar values corresponding
  * to the anchor coordinates.
  */
@@ -1306,7 +1334,7 @@ function randomData() {
 
     locationData = [];
 
-    for (i=0; i<numSamples; i++) {
+    for (i=0; i&lt;numSamples; i++) {
         var xi = Math.random() * (xmax - xmin + 1)  + xmin;
         var yi = Math.random() * (ymax - ymin + 1)  + ymin;
         locationData.push({ anchor: {x: xi, y: yi}});
@@ -1468,7 +1496,7 @@ function changeDataRadius(val){
     dataRadius = parseInt(val);
     d3.select('#complexRadiusInput').node().value =  dataRadius;
     d3.select('#complexDataRadius').node().value = dataRadius;
-    if(dataRadius < originalDataRadius) {
+    if(dataRadius &lt; originalDataRadius) {
         perturbData();
         originalDataRadius = dataRadius;
         addSampleSensors();
@@ -1504,7 +1532,7 @@ function addSampleSensors(){
 function createRandomPoints(d){
   var r, theta, xj, yj;
   var tmp = [];
-  for (j=0; j<numPoints; j++) {
+  for (j=0; j&lt;numPoints; j++) {
     r = math.random(dataRadius);
     theta = math.random(2*math.pi);
     xj = d.anchor.x + r * math.cos(theta);
@@ -1529,12 +1557,13 @@ function perturbData() {
 }
 
 /**
- * Toggle between Vietoris-Rips and &#268;ech complexes.
+ * Toggle between Vietoris-Rips and &amp;#268;ech complexes.
  */
 function changeComplex() {
 
     d = document.getElementsByName('complexType');
     if (d[0].checked) {
+        console.log('here')
         complexType = 'Cech'
         renderComplex(cechEdges, cechFaces);
     } else {
@@ -1569,6 +1598,7 @@ function addNode() {
  * @param coords {array} 2-element array with new node coordinates.
  */
 function updateNode(coords) {
+    console.log("update radius:"+complexRadius)
 
     if (locationData.length==0) {
         resetCheckboxes();
@@ -1576,7 +1606,7 @@ function updateNode(coords) {
 
     i = locationData.length;
     var x,y;
-    if (newxScale && newyScale) {
+    if (newxScale &amp;&amp; newyScale) {
         x = newxScale.invert(coords[0] - padding);
         y = newyScale.invert(coords[1] - padding);
     } else {
@@ -1624,6 +1654,7 @@ function updateNode(coords) {
  * @param d {Boolean} Show if true, hide if false.
  */
 function showCoverage(d) {
+    console.log(d)
     if (d) {
         fillColor = '#9370db';
         fillOpacity = '0.1';
@@ -1704,7 +1735,7 @@ function dragEnd() {
         coords = d3.mouse(d3.select('#complexSVG').node());
         i = this.id.match(/\d+/g);
         var x,y;
-        if (newxScale && newyScale) {
+        if (newxScale &amp;&amp; newyScale) {
             x = newxScale.invert(coords[0] - padding);
             y = newyScale.invert(coords[1] - padding);
         } else {
@@ -1728,7 +1759,7 @@ function dragEnd() {
         updateComplex(document.getElementById('complexInput').value);
     }
     wasDragged = false;
-    for (i=0; i<selectedNodes.length; i++) {
+    for (i=0; i&lt;selectedNodes.length; i++) {
         highlightPoint([],selectedNodes[i])
     }
 }
@@ -1763,9 +1794,10 @@ function selectNode() {
  */
 function nodeSelector() {
     if (event.code=='Delete' || event.code=='Backspace') {
+        console.log(event.code)
         window.removeEventListener('keydown', nodeSelector)
         selectedNodes = selectedNodes.sort(function(a, b){return a-b});
-        for (j = 0; j < selectedNodes.length; j++) {
+        for (j = 0; j &lt; selectedNodes.length; j++) {
             locationData.splice(selectedNodes[j]-j, 1);
         }
         numSamples = locationData.length;
@@ -1828,4 +1860,26 @@ function setMax() {
     var maxval = prompt('Enter maximum radius value',rmax)
     d3.select('#complexInput').attr('max', maxval);
     d3.select('#complexRadius').attr('max', maxval);
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addNode">addNode</a></li><li><a href="global.html#addSampleSensors">addSampleSensors</a></li><li><a href="global.html#changeColorScale">changeColorScale</a></li><li><a href="global.html#changeComplex">changeComplex</a></li><li><a href="global.html#changeDataRadius">changeDataRadius</a></li><li><a href="global.html#changeNumberSampleSensors">changeNumberSampleSensors</a></li><li><a href="global.html#clearScreen">clearScreen</a></li><li><a href="global.html#constructCech">constructCech</a></li><li><a href="global.html#constructEdges">constructEdges</a></li><li><a href="global.html#constructRips">constructRips</a></li><li><a href="global.html#createFaceLengend">createFaceLengend</a></li><li><a href="global.html#createRandomPoints">createRandomPoints</a></li><li><a href="global.html#dataLoader">dataLoader</a></li><li><a href="global.html#dragEnd">dragEnd</a></li><li><a href="global.html#dragNode">dragNode</a></li><li><a href="global.html#hideToolTip">hideToolTip</a></li><li><a href="global.html#highlightEdge">highlightEdge</a></li><li><a href="global.html#highlightFace">highlightFace</a></li><li><a href="global.html#highlightPoint">highlightPoint</a></li><li><a href="global.html#importData">importData</a></li><li><a href="global.html#loadData">loadData</a></li><li><a href="global.html#nodeSelector">nodeSelector</a></li><li><a href="global.html#perturbData">perturbData</a></li><li><a href="global.html#randomData">randomData</a></li><li><a href="global.html#renderAllEdges">renderAllEdges</a></li><li><a href="global.html#renderComplex">renderComplex</a></li><li><a href="global.html#renderEdges">renderEdges</a></li><li><a href="global.html#renderFaces">renderFaces</a></li><li><a href="global.html#renderGrid">renderGrid</a></li><li><a href="global.html#renderPoints">renderPoints</a></li><li><a href="global.html#renderView">renderView</a></li><li><a href="global.html#resetCheckboxes">resetCheckboxes</a></li><li><a href="global.html#resetEdge">resetEdge</a></li><li><a href="global.html#resetFace">resetFace</a></li><li><a href="global.html#resetPoint">resetPoint</a></li><li><a href="global.html#saveData">saveData</a></li><li><a href="global.html#selectNode">selectNode</a></li><li><a href="global.html#setMax">setMax</a></li><li><a href="global.html#show">show</a></li><li><a href="global.html#showCoverage">showCoverage</a></li><li><a href="global.html#showToolTip">showToolTip</a></li><li><a href="global.html#sqEuclidDist">sqEuclidDist</a></li><li><a href="global.html#updateComplex">updateComplex</a></li><li><a href="global.html#updateNode">updateNode</a></li><li><a href="global.html#updateScales">updateScales</a></li><li><a href="global.html#zoomed">zoomed</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.2</a> on Thu Jul 13 2017 13:27:20 GMT-0600 (MDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
