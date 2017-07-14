@@ -226,6 +226,7 @@ function createFaceLengend() {
     var legendAxis = d3.legendColor()
         .shapeWidth(50)
         .orient("horizontal")
+        .labels(["0.01", "0.17", "0.34", "0.51", "0.68", "0.85", "1.00"])
         .scale(faceColorScale);
 
     legend.select(".legendSequential").call(legendAxis);
