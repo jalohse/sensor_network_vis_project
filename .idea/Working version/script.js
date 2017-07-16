@@ -222,7 +222,9 @@ function createEdgeLegend() {
  */
 function createFaceLengend() {
     var legend = d3.select("#face_legend");
-
+    legend.select('.legendSequential').remove()
+    legend.append("g")
+        .attr("class", "legendSequential")
     var legendAxis = d3.legendColor()
         .shapeWidth(50)
         .orient("horizontal")
