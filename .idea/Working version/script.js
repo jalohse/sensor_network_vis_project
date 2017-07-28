@@ -85,21 +85,21 @@ var greenBlueEdgeScale = ["#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"]
 var pinkEdgeScale = ["#c994c7", "#df65b0", "#e7298a", "#ce1256", "#91003f"];
 
 
-var faceYellowBlueScale = d3.scaleOrdinal().range(yellowBlueScale).domain([0.01, 0.17, 0.34, .51, .68, .85, 1]);
-var faceYellowRedScale = d3.scaleOrdinal().range(yellowRedScale).domain([0.01, 0.17, 0.34, .51, .68, .85, 1]);
-var faceBluePurpleScale = d3.scaleOrdinal().range(bluePurpleScale).domain([0.01, 0.17, 0.34, .51, .68, .85, 1]);
-var faceRedScale = d3.scaleOrdinal().range(redScale).domain([0.01, 0.17, 0.34, .51, .68, .85, 1]);
-var faceGreenScale = d3.scaleOrdinal().range(greenScale).domain([0.01, 0.17, 0.34, .51, .68, .85, 1]);
+var faceYellowBlueScale = d3.scaleQuantize().range(yellowBlueScale).domain([0, 1]);
+var faceYellowRedScale = d3.scaleQuantize().range(yellowRedScale).domain([0, 1]);
+var faceBluePurpleScale = d3.scaleQuantize().range(bluePurpleScale).domain([0, 1]);
+var faceRedScale = d3.scaleQuantize().range(redScale).domain([0, 1]);
+var faceGreenScale = d3.scaleQuantize().range(greenScale).domain([0, 1]);
 
 
 var faceColorScale = faceYellowBlueScale;
 
 
-var edgeRedScale = d3.scaleOrdinal().range(redEdgeScale).domain([0.01, 0.25, 0.5, 0.75, 1]);
-var edgeBlueGreenScale = d3.scaleOrdinal().range(blueGreenEdgeScale).domain([0.01, 0.25, 0.5, 0.75, 1]);
-var edgePinkPurpleScale = d3.scaleOrdinal().range(pinkPurpleEdgeScale).domain([0.01, 0.25, 0.5, 0.75, 1]);
-var edgeGreenBlueScale = d3.scaleOrdinal().range(greenBlueEdgeScale).domain([0.01, 0.25, 0.5, 0.75, 1]);
-var edgePinkScale = d3.scaleOrdinal().range(pinkEdgeScale).domain([0.01, 0.25, 0.5, 0.75, 1]);
+var edgeRedScale = d3.scaleQuantize().range(redEdgeScale).domain([0, 1]);
+var edgeBlueGreenScale = d3.scaleQuantize().range(blueGreenEdgeScale).domain([0, 1]);
+var edgePinkPurpleScale = d3.scaleQuantize().range(pinkPurpleEdgeScale).domain([0, 1]);
+var edgeGreenBlueScale = d3.scaleQuantize().range(greenBlueEdgeScale).domain([0, 1]);
+var edgePinkScale = d3.scaleQuantize().range(pinkEdgeScale).domain([0, 1]);
 
 var edgeColorScale = edgeRedScale;
 
@@ -187,8 +187,7 @@ function createEdgeLegend() {
     var legendSizeLine = d3.legendSize()
         .scale(edgeWidthScale)
         .shape("line")
-        .orient("horizontal").labels(["0.01",
-            "0.25", "0.50", "0.75", "1.00"])
+        .orient("horizontal").labels(["0.20", "0.40", "0.60", "0.80", "1.00"])
         .labelWrap(30)
         .shapeWidth(40)
         .labelAlign("start")
@@ -228,7 +227,7 @@ function createFaceLengend() {
     var legendAxis = d3.legendColor()
         .shapeWidth(50)
         .orient("horizontal")
-        .labels(["0.01", "0.17", "0.34", "0.51", "0.68", "0.85", "1.00"])
+        .labels(["0.14", "0.29", "0.43", "0.57", "0.71", "0.86", "1.00"])
         .scale(faceColorScale);
 
     legend.select(".legendSequential").call(legendAxis);
@@ -480,6 +479,8 @@ function highlightEdge() {
         showToolTip('Edge', data.Pedge);
     }
 
+    data = (arguments.length == 3) ? this : data;
+
 
     if (arguments.length == 3) {
         d3.select(this)
@@ -531,6 +532,7 @@ function resetEdge() {
  * Highlight face along with it's corresponding edges and points.
  */
 function highlightFace() {
+
     var data = arguments[0];
     if(data.hasOwnProperty("Pface")){
         showToolTip('Face', data["Pface"]);
@@ -564,29 +566,24 @@ function highlightFace() {
 function resetFace() {
     hideToolTip();
 
-    if ( arguments.length > 1) {
-        d3.select(this)
-            .transition()
-            .style('fill', faceColorScale(arguments[0].Pface));
+    faces = complexType == 'Cech' ? cechFaces : ripsFaces;
 
-        resetEdge('#complex_Edge_' + arguments[0].Pt1 + '_' + arguments[0].Pt2);
-        resetEdge('#complex_Edge_' + arguments[0].Pt1 + '_' + arguments[0].Pt3);
-        resetEdge('#complex_Edge_' + arguments[0].Pt2 + '_' + arguments[0].Pt3);
+    faces.forEach( function (d) {
+        d3.select('#complex_Face_'+d.Pt1+'_'+d.Pt2+'_'+d.Pt3)
+            .moveToFront()
+    })
 
-        resetPoint(arguments[0].Pt1);
-        resetPoint(arguments[0].Pt2);
-        resetPoint(arguments[0].Pt3);
-    } else {
-        faces = complexType == 'Cech' ? cechFaces : ripsFaces;
-        d3.select('#complex_Face_'+faces[arguments[0]].Pt1+'_'+faces[arguments[0]].Pt2+'_'+faces[arguments[0]].Pt3)
-            .transition()
-            .style('fill', faceColorScale(faces[arguments[0]].Pface));
+    d3.select(this)
+        .transition()
+        .style('fill', faceColorScale(arguments[0].Pface));
 
-        faces.forEach( function (d) {
-            d3.select('#complex_Face_'+d.Pt1+'_'+d.Pt2+'_'+d.Pt3)
-                .moveToFront()
-        })
-    }
+    resetEdge('#complex_Edge_' + arguments[0].Pt1 + '_' + arguments[0].Pt2);
+    resetEdge('#complex_Edge_' + arguments[0].Pt1 + '_' + arguments[0].Pt3);
+    resetEdge('#complex_Edge_' + arguments[0].Pt2 + '_' + arguments[0].Pt3);
+
+    resetPoint(arguments[0].Pt1);
+    resetPoint(arguments[0].Pt2);
+    resetPoint(arguments[0].Pt3);
 
 }
 
@@ -916,9 +913,9 @@ function renderComplex(edges,faces) {
 function renderEdges(){
     var edges;
     if (complexType=='Cech') {
-        edges = cechEdges;
+        edges = cechEdges.sort( function (a, b) { return a.Pedge - b.Pedge } );
     } else if (complexType=='Vietoris-Rips') {
-        edges = ripsEdges;
+        edges = ripsEdges.sort( function (a, b) { return a.Pedge - b.Pedge } );
     }
     complexCanvas.selectAll('.edge').remove();
     var complexEdges = complexCanvas.select('g#complexEdges');
@@ -956,21 +953,13 @@ function renderEdges(){
 function renderFaces(){
     var faces;
     if (complexType=='Cech') {
-        faces = cechFaces;
+        faces = cechFaces.sort( function (a, b) { return a.Pface - b.Pface } );
     } else if (complexType=='Vietoris-Rips') {
-        faces = ripsFaces;
+        faces = ripsFaces.sort( function (a, b) { return a.Pface - b.Pface } );
     }
-    faces.sort( function (a, b) { return a.Pface - b.Pface } )
-    faces.forEach( function (d, i) {
-        locationData[d.Pt1].link.edges.push([d.Pt2, d.Pt3])
-        locationData[d.Pt1].star.faces.push(i)
-        locationData[d.Pt2].link.edges.push([d.Pt1, d.Pt3])
-        locationData[d.Pt2].star.faces.push(i)
-        locationData[d.Pt3].link.edges.push([d.Pt1, d.Pt2])
-        locationData[d.Pt3].star.faces.push(i)
-    })
 
-    complexCanvas.selectAll('.face').remove();
+    // console.log(faces)
+    complexCanvas.select('.face').remove();
     var complexFaces = complexCanvas.select('g#complexFaces');
     complexFaces.selectAll('polygon').data(faces)
         .enter().append('polygon')
@@ -982,6 +971,8 @@ function renderFaces(){
             }
         )
         .attr('id', function (d, i) {
+            // fc = faceColorScale(d.Pface)
+            // console.log(d.Pt1+' '+d.Pt2+' '+d.Pt3+' p='+d.Pface+', color='+fc)
             return 'complex_Face_'+d.Pt1+'_'+d.Pt2+'_'+d.Pt3;
         })
         .attr('fill', function (d) {
@@ -1091,7 +1082,7 @@ function renderPoints() {
                         return yScale(d.y) + padding / newZscale;
                     }
                 })
-                .attr('id', function (d, i) {5
+                .attr('id', function (d, i) {
                     return 'complex_small_Point_' + j.toString() + '_' + i.toString();
                 })
                 .attr('r', 2/newZscale);
@@ -1133,24 +1124,29 @@ function renderPoints() {
         .attr('r', xScale(dataRadius + complexRadius + xScale.domain()[0]));
 
     // For plotting node labels (disable, only for troubleshooting)
-    //
-    // r = xScale(dataRadius + xScale.domain()[0])+5;
-    // textOffset = -r * Math.cos( 3*Math.PI/4 );
-    //
-    // complexPoints.selectAll('text')
-    //     .data(locationData)
-    //     .enter().append('text')
-    //     .text( function (d, i) {
-    //         return i.toString();
-    //     })
-    //     .attr('x', function (d) {
-    //         return xScale(d.anchor.x) + padding/newZscale;
-    //     })
-    //     .attr('y', function (d) {
-    //         return yScale(d.anchor.y) + padding/newZscale;
-    //     })
-    //     .attr('dx',textOffset)
-    //     .attr('dy',textOffset);
+   //
+   //  r = xScale(dataRadius + xScale.domain()[0])+5;
+   //  textOffset = -r * Math.cos( 3*Math.PI/4 );
+   //
+   // complexCanvas.selectAll('.text').remove();
+   //  var labels = complexCanvas.append('g')
+   //     .attr('id','labels')
+   //
+   //  labels.selectAll('text')
+   //      .data(locationData)
+   //      .enter().append('text')
+   //      .text( function (d, i) {
+   //          return i.toString();
+   //      })
+   //      .attr('x', function (d) {
+   //          return xScale(d.anchor.x) + padding/newZscale;
+   //      })
+   //      .attr('y', function (d) {
+   //          return yScale(d.anchor.y) + padding/newZscale;
+   //      })
+   //      .attr('dx',textOffset)
+   //      .attr('dy',textOffset)
+   //      .style('stroke','#000');
 
     renderView()
 
