@@ -20,8 +20,37 @@
 </div>
 <table>
   <tr>
-    <td id="plotArea" width="85%" style="border: 1px solid black; background-color: white" rowspan="2">
+    <td id="plotArea" width="75%" style="border: 1px solid black; background-color: white" rowspan="2">
       <div id="plotDiv"></div>
+    </td>
+    <td width="13%" style="vertical-align: top">
+      <h3>Viewing Panel</h3>
+      <p>
+        Complex type:
+        <br>
+        <input type="radio" name="complexType" value="cech" onchange="changeComplex()">&#268;ech
+        <br>
+        <input type="radio" name="complexType" value="rips" onchange="changeComplex()" checked>Rips
+      </p>
+      <p>
+        <input type="checkbox" id="nodeRadiusCheckbox" class="viewCheckbox" onclick="show(this.checked, '.point')">
+        <label for="nodeCheckbox">Nodes</label>
+        <br>
+        <input type="checkbox" id="nodeCheckbox" class="viewCheckbox" disabled="disabled" onclick="show(this.checked, '.small_circle')">
+        <label for="nodeCheckbox">Potential nodes</label>
+        <br>
+        <input type="checkbox" id="coverCheckbox" class="viewCheckbox" disabled="disabled" onclick="showCoverage(this.checked)">
+        <label for="coverCheckbox">Node coverage</label>
+        <br>
+        <input type="checkbox" id="edgeCheckbox" class="viewCheckbox" disabled="disabled" onclick="show(this.checked, '.edge')">
+        <label for="edgeCheckbox">Edges</label>
+        <br>
+        <input type="checkbox" id="allEdgeCheckbox" class="viewCheckbox"  onclick="show(this.checked, '.individual_edge')">
+        <label for="edgeCheckbox">Potential edges</label>
+        <br>
+        <input type="checkbox" id="faceCheckbox" class="viewCheckbox" disabled="disabled" onclick="show(this.checked, '.face')">
+        <label for="faceCheckbox">Faces</label>
+      </p>
     </td>
     <td id="controlPanel" style="vertical-align: top;">
       <!-- The control panel for data loading and saving as well as data manipulation-->
@@ -49,79 +78,64 @@
         <button type="button" name="addButton" id="addButton" class="inputfile" onclick="addNode()">Add nodes</button>
         <label for="addButton">Add nodes</label>
       </p>
-      <p>Coverage radius:<input type="range" id="complexInput" min="1" max="50" value="20" oninput="updateComplex(this.value)" />
-        <input type="number" name="complexRadius" id="complexRadius" min="1" max="50" value="20"  onchange="updateComplex(this.value)" />
+      <p>Coverage radius:
+        <br><input type="range" id="complexInput" min="1" max="50" value="20" oninput="updateComplex(this.value)" />
+        <br><input type="number" name="complexRadius" id="complexRadius" min="1" max="50" value="20"  onchange="updateComplex(this.value)" />
         <button type="button" onclick="setMax()">Max</button>
       <p>
         <button type="button" name="numSamplesButton" id="numSamplesButton" class="inputfile" onclick="changeNumberSampleSensors()">Number of Sensor Samples</button>
         <label for="numSamplesButton">Update </label>
         <br>
-        # potential locations per sensor:
-        <input type="number" name="numSampleSensors" id="numSampleSensors" value="8" min="1" max="1000">
+        # potential locations<br> per sensor:
+        <br><input type="number" name="numSampleSensors" id="numSampleSensors" value="8" min="1" max="1000">
       </p>
       <p>Radius of uncertainty:<input type="range" id="complexRadiusInput" min="1" max="50" value="10" oninput="changeDataRadius(this.value)"/>
-        <input type="number" name="complexDataRadius" id="complexDataRadius" min="1" max="50" value="10"  onchange="changeDataRadius(this.value)" />
+        <br><input type="number" name="complexDataRadius" id="complexDataRadius" min="1" max="50" value="10"  onchange="changeDataRadius(this.value)" />
       </p>
     </td>
+  <!--</tr>-->
+
+  <!--<tr>-->
   </tr>
 
   <tr>
-    <td>
-      <h3>View</h3>
-      <p>
-        Complex type:
-        <br>
-        <input type="radio" name="complexType" value="cech" onchange="changeComplex()">&#268;ech
-        <br>
-        <input type="radio" name="complexType" value="rips" onchange="changeComplex()" checked>Rips-Vietoris
-      </p>
-      <p>
-        <input type="checkbox" id="nodeRadiusCheckbox" class="viewCheckbox" onclick="show(this.checked, '.point')">
-        <label for="nodeCheckbox">Nodes</label>
-        <br>
-        <input type="checkbox" id="nodeCheckbox" class="viewCheckbox" disabled="disabled" onclick="show(this.checked, '.small_circle')">
-        <label for="nodeCheckbox">Potential nodes</label>
-        <br>
-        <input type="checkbox" id="coverCheckbox" class="viewCheckbox" disabled="disabled" onclick="showCoverage(this.checked)">
-        <label for="coverCheckbox">Node coverage</label>
-        <br>
-        <input type="checkbox" id="edgeCheckbox" class="viewCheckbox" disabled="disabled" onclick="show(this.checked, '.edge')">
-        <label for="edgeCheckbox">Edges</label>
-        <br>
-        <input type="checkbox" id="allEdgeCheckbox" class="viewCheckbox"  onclick="show(this.checked, '.individual_edge')">
-        <label for="edgeCheckbox">Potential edges</label>
-        <br>
-        <input type="checkbox" id="faceCheckbox" class="viewCheckbox" disabled="disabled" onclick="show(this.checked, '.face')">
-        <label for="faceCheckbox">Faces</label>
-      </p>
-    </td>
-  </tr>
+    <!--<td >-->
+      <!--<table id="legend">-->
+      <!--<h3>Legend</h3>-->
+      <!--<tr>-->
+      <!--<td>-->
+      <!--<p>Probability of Face:</p>-->
+      <!--<select id="colorScale" onchange="changeColorScale(this.value)"> Color Scale-->
+      <!--<option value="yellowBlue">Yellow to Blue</option>-->
+      <!--<option value="yellowRed">Yellow to Red</option>-->
+      <!--<option value="bluePurple">Blue to Purple</option>-->
+      <!--<option value="red">Red</option>-->
+      <!--<option value="green">Green</option>-->
+      <!--</select>-->
+      <!--<br>-->
+      <!--<svg id="face_legend"></svg>-->
+      <!--</td>-->
+      <!--<td>-->
+      <!--<p>Probability of Edge:</p>-->
+      <!--<svg id="edge_legend"></svg>-->
+      <!--</td>-->
+      <!--</tr>-->
+      <!--</table>-->
 
-  <tr>
-    <td >
-      <table id="legend">
-        <h3>Legend</h3>
-        <tr>
-          <td>
-            <p>Probability of Face:</p>
-            <select id="colorScale" onchange="changeColorScale(this.value)"> Color Scale
+    <!--</td>-->
+    <td colspan="2">
+        <h3>Color Panel</h3>
+            Select color scale:
+            <select id="colorScale" onchange="changeColorScale(this.value)">
               <option value="yellowBlue">Yellow to Blue</option>
               <option value="yellowRed">Yellow to Red</option>
               <option value="bluePurple">Blue to Purple</option>
               <option value="red">Red</option>
               <option value="green">Green</option>
             </select>
-            <br>
-            <svg id="face_legend" width="352px" height="60px">
-              <g class="legendSequential"></g>
-            </svg>
-          </td>
-          <td>
-            <p>Probability of Edge:</p>
-            <svg id="edge_legend" width="800px" height="60px"></svg>
-          </td>
-        </tr>
-      </table>
+            <svg id="legend"></svg>
+      <hr>
+      Labels correspond to upper limit of probability range.
 
     </td>
     <!--<td>-->

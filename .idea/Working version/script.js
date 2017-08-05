@@ -2,6 +2,42 @@
 //Created by Tim on 11/10/2016.
 //
 // Common variables and functions used by all of the example plots
+//
+
+var yellowRedScale = ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"];
+var yellowBlueScale = ["#ffffcc", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"];
+var bluePurpleScale = ["#edf8fb", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#6e016b"];
+var redScale = ["#fef0d9", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#990000"];
+var greenScale = ["#edf8fb", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#005824"];
+
+var redEdgeScale = ['#fee5d9','#fcbba1','#fc9272','#fb6a4a','#ef3b2c','#cb181d','#99000d'];
+var blueGreenEdgeScale = ["#f6eff7","#d0d1e6","#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016450"];
+var pinkPurpleEdgeScale = ['#feebe2','#fcc5c0','#fa9fb5','#f768a1','#dd3497','#ae017e','#7a0177'];
+var greenBlueEdgeScale = ['#ffffcc','#c7e9b4','#7fcdbb','#41b6c4','#1d91c0','#225ea8','#0c2c84'];
+var pinkEdgeScale = ['#f1eef6','#d4b9da','#c994c7','#df65b0','#e7298a','#ce1256','#91003f']
+
+
+var faceYellowBlueScale = d3.scaleQuantize().range(yellowBlueScale).domain([0, 1]);
+var faceYellowRedScale = d3.scaleQuantize().range(yellowRedScale).domain([0, 1]);
+var faceBluePurpleScale = d3.scaleQuantize().range(bluePurpleScale).domain([0, 1]);
+var faceRedScale = d3.scaleQuantize().range(redScale).domain([0, 1]);
+var faceGreenScale = d3.scaleQuantize().range(greenScale).domain([0, 1]);
+
+
+var faceColorScale = faceYellowBlueScale;
+
+
+var edgeRedScale = d3.scaleQuantize().range(redEdgeScale).domain([0, 1]);
+var edgeBlueGreenScale = d3.scaleQuantize().range(blueGreenEdgeScale).domain([0, 1]);
+var edgePinkPurpleScale = d3.scaleQuantize().range(pinkPurpleEdgeScale).domain([0, 1]);
+var edgeGreenBlueScale = d3.scaleQuantize().range(greenBlueEdgeScale).domain([0, 1]);
+var edgePinkScale = d3.scaleQuantize().range(pinkEdgeScale).domain([0, 1]);
+
+var edgeColorScale = edgeRedScale;
+
+var edgeWidthScale = d3.scaleLinear().range([6, 6]).domain([0.01, 1]);
+
+createLegends();
 
 var width = document.getElementById('plotArea').offsetWidth;          //Width of each plot
 var height = document.getElementById('plotArea').offsetHeight;         //Height of each plot
@@ -72,38 +108,7 @@ var gY = complexSVG.append('g')
     .call(yAxis);
 
 
-var yellowRedScale = ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"];
-var yellowBlueScale = ["#ffffcc", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"];
-var bluePurpleScale = ["#edf8fb", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#6e016b"];
-var redScale = ["#fef0d9", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#990000"];
-var greenScale = ["#edf8fb", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#005824"];
 
-var redEdgeScale = ["#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#990000"];
-var blueGreenEdgeScale = ["#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016450"];
-var pinkPurpleEdgeScale = ["#feebe2", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497"];
-var greenBlueEdgeScale = ["#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"];
-var pinkEdgeScale = ["#c994c7", "#df65b0", "#e7298a", "#ce1256", "#91003f"];
-
-
-var faceYellowBlueScale = d3.scaleQuantize().range(yellowBlueScale).domain([0, 1]);
-var faceYellowRedScale = d3.scaleQuantize().range(yellowRedScale).domain([0, 1]);
-var faceBluePurpleScale = d3.scaleQuantize().range(bluePurpleScale).domain([0, 1]);
-var faceRedScale = d3.scaleQuantize().range(redScale).domain([0, 1]);
-var faceGreenScale = d3.scaleQuantize().range(greenScale).domain([0, 1]);
-
-
-var faceColorScale = faceYellowBlueScale;
-
-
-var edgeRedScale = d3.scaleQuantize().range(redEdgeScale).domain([0, 1]);
-var edgeBlueGreenScale = d3.scaleQuantize().range(blueGreenEdgeScale).domain([0, 1]);
-var edgePinkPurpleScale = d3.scaleQuantize().range(pinkPurpleEdgeScale).domain([0, 1]);
-var edgeGreenBlueScale = d3.scaleQuantize().range(greenBlueEdgeScale).domain([0, 1]);
-var edgePinkScale = d3.scaleQuantize().range(pinkEdgeScale).domain([0, 1]);
-
-var edgeColorScale = edgeRedScale;
-
-var edgeWidthScale = d3.scaleLinear().range([6, 6]).domain([0.01, 1]);
 
 var complexCanvas = complexSVG.append('g')
     .attr('class','cech')
@@ -158,7 +163,6 @@ renderGrid();
 
 dataLoader('data/data.json')
 
-createLegends();
 
 d3.selection.prototype.moveToFront = function() {
     return this.each(function(){
@@ -179,58 +183,108 @@ function createEdgeLegend() {
      * Creates edge legend based on selected color scale
      *
      */
-    var edgeLegend = d3.select('#edge_legend');
-    edgeLegend.append("g")
-        .attr("class", "legendSizeLine")
-        .attr("transform", "translate(0, 20)");
 
-    var legendSizeLine = d3.legendSize()
-        .scale(edgeWidthScale)
-        .shape("line")
-        .orient("horizontal").labels(["0.20", "0.40", "0.60", "0.80", "1.00"])
-        .labelWrap(30)
-        .shapeWidth(40)
-        .labelAlign("start")
+    var legend = d3.select("#legend");
+    legend.select('#legendEdge').remove()
+    legend.append("g")
+        .attr("id", "legendEdge")
+        .attr('transform','translate(20,100)')
+    var legendAxis = d3.legendColor()
+        .scale(edgeColorScale)
+        .orient('horizontal')
+        .labelFormat(d3.format('.2f'))
+        .labels(["0.14", "0.29", "0.43", "0.57", "0.71", "0.86", "1.00"])
+        .title('Edge probability:')
+        .shapeWidth(30)
+        .shapeHeight(6)
+        .labelAlign('center')
         .shapePadding(10);
 
-    edgeLegend.select(".legendSizeLine")
-        .call(legendSizeLine);
+    legend.select("#legendEdge").call(legendAxis);
 
-    var lines = edgeLegend.selectAll("line");
-    lines.attr('stroke', function (d, i) {
-        if (i == 0) {
-            return edgeColorScale(0.01);
-        }
-        if (i == 1) {
-            return edgeColorScale(0.25);
-        }
-        if (i == 2) {
-            return edgeColorScale(0.5);
-        }
-        if (i == 3) {
-            return edgeColorScale(0.75);
-        }
-        if (i == 4) {
-            return edgeColorScale(1);
-        }
-    });
+    // var edgeLegend = d3.select('#edge_legend');
+    // edgeLegend.append("g")
+    //     .attr("class", "legendSizeLine")
+    //     .attr("transform", "translate(0, 20)");
+    //
+    // var legendSizeLine = d3.legendSize()
+    //     .scale(edgeWidthScale)
+    //     .shape("line")
+    //     .orient("horizontal").labels(["0.14", "0.29", "0.43", "0.57", "0.71", "0.86", "1.00"])
+    //     .labelWrap(30)
+    //     .shapeWidth(40)
+    //     .labelAlign("start")
+    //     .shapePadding(10);
+    //
+    // edgeLegend.select(".legendSizeLine")
+    //     .call(legendSizeLine);
+
+    // var lines = edgeLegend.selectAll("line");
+    // lines.attr('stroke', function (d, i) {
+    //     if (i == 0) {
+    //         return edgeColorScale(0.14);
+    //     }
+    //     if (i == 1) {
+    //         return edgeColorScale(0.29);
+    //     }
+    //     if (i == 2) {
+    //         return edgeColorScale(0.43);
+    //     }
+    //     if (i == 3) {
+    //         return edgeColorScale(0.57);
+    //     }
+    //     if (i == 4) {
+    //         return edgeColorScale(0.71);
+    //     }
+    //     if (i == 5) {
+    //         return edgeColorScale(0.86);
+    //     }
+    // });
 }
 
 /**
  * Create face legend based on selected color scale.
  */
 function createFaceLengend() {
-    var legend = d3.select("#face_legend");
-    legend.select('.legendSequential').remove()
-    legend.append("g")
-        .attr("class", "legendSequential")
-    var legendAxis = d3.legendColor()
-        .shapeWidth(50)
-        .orient("horizontal")
-        .labels(["0.14", "0.29", "0.43", "0.57", "0.71", "0.86", "1.00"])
-        .scale(faceColorScale);
 
-    legend.select(".legendSequential").call(legendAxis);
+    // var quantize = d3.scaleQuantize()
+    //     .domain([0,1])
+    //     .range(["#ffffcc", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"]);
+    //
+    // console.log(quantize(0.5))
+    //
+    // var legend = d3.select('#face_legend');
+    //
+    // legend.select('.legendSequential').remove()
+    // legend.append('g')
+    //     .attr('class','legendSequential')
+    //     .attr('transform','translate(20,20)')
+    //
+    // var legendAxis = d3.legendColor()
+    //     .labelFormat(d3.format(".2f"))
+    //     .useClass(true)
+    //     .title('Face probability:')
+    //     .titleWidth(100)
+    //     .scale(quantize);
+    //
+    // legend.select('.legendSequential').call(legendAxis);
+
+    var legend = d3.select("#legend");
+    legend.select('#legendFace').remove()
+    legend.append("g")
+        .attr('id','legendFace')
+        .attr('transform','translate(20,20)')
+    var legendAxis = d3.legendColor()
+        .scale(faceColorScale)
+        .title('Face probability:')
+        .orient('horizontal')
+        .labelFormat(d3.format('.2f'))
+        .labels(["0.14", "0.29", "0.43", "0.57", "0.71", "0.86", "1.00"])
+        .shapeWidth(30)
+        .labelAlign('center')
+        .shapePadding(10);
+
+    legend.select("#legendFace").call(legendAxis);
 }
 
 /**
@@ -940,7 +994,7 @@ function renderEdges(){
     var edges;
     if (complexType=='Cech') {
         edges = cechEdges.sort( function (a, b) { return a.Pedge - b.Pedge } );
-    } else if (complexType=='Vietoris-Rips') {
+    } else if (complexType=='Rips') {
         edges = ripsEdges.sort( function (a, b) { return a.Pedge - b.Pedge } );
     }
     complexCanvas.selectAll('.edge').remove();
@@ -949,7 +1003,7 @@ function renderEdges(){
         .enter().append('line')
         .attr('class', 'edge')
         .style('stroke-width', function(d){
-            return edgeWidthScale(d.Pedge)/newZscale;
+            return 6/newZscale;
         })
         .attr('x1', function (d) {
             return xScale(locationData[d.Pt1].anchor.x) + pad;
@@ -980,11 +1034,11 @@ function renderFaces(){
     var faces;
     if (complexType=='Cech') {
         faces = cechFaces.sort( function (a, b) { return a.Pface - b.Pface } );
-    } else if (complexType=='Vietoris-Rips') {
+    } else if (complexType=='Rips') {
         faces = ripsFaces.sort( function (a, b) { return a.Pface - b.Pface } );
     }
 
-    console.log(faces)
+    // console.log(faces)
     complexCanvas.select('.face').remove();
     var complexFaces = complexCanvas.select('g#complexFaces');
     complexFaces.selectAll('polygon').data(faces)
@@ -998,7 +1052,7 @@ function renderFaces(){
         )
         .attr('id', function (d, i) {
             fc = faceColorScale(d.Pface)
-            console.log(d.Pt1+' '+d.Pt2+' '+d.Pt3+' p='+d.Pface+', color='+fc)
+            // console.log(d.Pt1+' '+d.Pt2+' '+d.Pt3+' p='+d.Pface+', color='+fc)
             return 'complex_Face_'+d.Pt1+'_'+d.Pt2+'_'+d.Pt3;
         })
         .attr('fill', function (d) {
@@ -1205,24 +1259,41 @@ function renderView() {
  * @param yMax {number} The maximum y-value to display.
  */
 function updateScales(xMin, xMax, yMin, yMax){
-    var aspectMin = Math.min(width, height);
-    var aspect, yScaleMax, xScaleMax;
 
+    var aspect = width/height;
+    var xRange = xMax-xMin;
+    var yRange = yMax-yMin;
+    var dataAspect = xRange/yRange;
 
-    if(aspectMin == height){
-        aspect = width / height;
-        yScaleMax = yMax;
-        xScaleMax = yScaleMax * aspect;
-        xScale.domain([xMin, xScaleMax]);
-        yScale.domain([yMin, yScaleMax]);
-
-    } else {
-        aspect = height / width;
+    if (dataAspect>1) {
         xScaleMax = xMax;
-        yScaleMax = xScaleMax * aspect;
-        xScale.domain([xMin, xScaleMax]);
-        yScale.domain([yMin, yScaleMax]);
+        yScaleMax = yMin + xRange/aspect;
+    } else {
+        xScaleMax = xMin = yRange*aspect;
+        yScaleMax = yMax;
     }
+
+    xScale.domain([xMin, xScaleMax])
+    yScale.domain([yMin, yScaleMax])
+
+    // var aspect, yScaleMax, xScaleMax;
+    //
+    //
+    // if(aspectMin == height){
+    //     aspect = width / height;
+    //     yScaleMax = yMax;
+    //     xScaleMax = yScaleMax * aspect;
+    //     xScale.domain([xMin, xScaleMax]);
+    //     yScale.domain([yMin, yScaleMax]);
+    //
+    // } else {
+    //     aspect = height / width;
+    //     xScaleMax = xMax;
+    //     yScaleMax = xScaleMax * aspect;
+    //     xScale.domain([xMin, xScaleMax]);
+    //     yScale.domain([yMin, yScaleMax]);
+    //     console.log('here')
+    // }
 
 }
 
@@ -1515,7 +1586,7 @@ function addSampleSensors(){
 
     if (complexType=='Cech') {
         constructCech();
-    } else if (complexType=='Vietoris-Rips') {
+    } else if (complexType=='Rips') {
         constructRips();
     }
     changeComplex();
@@ -1563,7 +1634,7 @@ function changeComplex() {
         complexType = 'Cech'
         renderComplex(cechEdges, cechFaces);
     } else {
-        complexType = 'Vietoris-Rips'
+        complexType = 'Rips'
         renderComplex(ripsEdges, ripsFaces);
     }
 }
