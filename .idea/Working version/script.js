@@ -486,10 +486,12 @@ function highlightPoint() {
 function resetPoint() {
 
     var n = (arguments.length == 3) ? arguments[1] : arguments[0]
+      if(selectedNodes.includes(n)) {
+        return
+      }
     var pt = '#complex_Point_'+n;
     var cir = '#complex_Circle_'+n;
     var d_cir = '#data_Circle_'+n;
-
 
     d3.select(pt)
         .transition()
