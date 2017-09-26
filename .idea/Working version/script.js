@@ -1271,7 +1271,7 @@ function updateScales(xMin, xMax, yMin, yMax){
         xScaleMax = xMax;
         yScaleMax = yMin + xRange/aspect;
     } else {
-        xScaleMax = xMin = yRange*aspect;
+        xScaleMax = xMin + yRange*aspect;
         yScaleMax = yMax;
     }
 
@@ -1416,14 +1416,15 @@ function randomData() {
     dataPadding = 0.1*dataRange;
 
     d3.select('#complexInput')
-        .attr('min', 0.05*dataRange)
-        .attr('max', 0.5*dataRange)
-        .attr('value', 0.2*dataRange);
+        .attr('min', 1)
+        .attr('max', Math.ceil(0.5*dataRange));
+
 
     resetCheckboxes();
 
     renderPoints();
     updateComplex(document.getElementById('complexInput').value);
+    console.log(complexRadius)
 }
 
 /**
@@ -1905,16 +1906,37 @@ function clearScreen() {
     gY.call(yAxis.scale(yScale));
     newxScale = false;
     newyScale = false;
+
+
     renderGrid();
 
-    complexRadius = 5;
-    numSamples = 0;
+    numSamples = 20;
+    d3.select('#numSensors')
+        .attr('min',1)
+        .attr('max',1000)
+    d3.select('#numSensors').node().value = numSamples;
 
+    numPoints = 8;
+    d3.select('#numSampleSensors')
+        .attr('min',1)
+        .attr('max',100)
+    d3.select('#numSampleSensors').node().value = numPoints;
+
+
+
+    complexRadius = 10;
     d3.select('#complexInput')
         .attr('min', 1)
         .attr('max', 50);
     d3.select('#complexInput').node().value = complexRadius;
     d3.select('#complexRadius').node().value = complexRadius;
+
+    dataRadius = 1;
+    d3.select('#complexRadiusInput')
+        .attr('min', 1)
+        .attr('max', 50);
+    d3.select('#complexRadiusInput').node().value = dataRadius;
+    d3.select('#complexDataRadius').node().value = dataRadius;
 }
 
 /**
