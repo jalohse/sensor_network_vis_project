@@ -702,7 +702,6 @@ function constructEdges() {
         d.link = {points: [], edges: []}
     })
 
-
     for (i = 0; i < numSamples - 1; i++) {
         x1 = locationData[i].anchor.x;
         y1 = locationData[i].anchor.y;
@@ -1910,7 +1909,7 @@ function clearScreen() {
 
     renderGrid();
 
-    numSamples = 20;
+    numSamples = 0;
     d3.select('#numSensors')
         .attr('min',1)
         .attr('max',1000)
